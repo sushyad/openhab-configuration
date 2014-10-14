@@ -1,0 +1,16 @@
+sitemap home label="Main Menu" {
+
+   Frame {
+        Text item=ElectricityUsage
+        Text item=sunsetTime
+	Switch item=Switch4 label="2nd Foyer Light" mappings=[ON="ON", OFF="OFF"]
+	Switch item=Switch21_BTN0 label="Switch 21 Button 0" mappings=[ON="ON", OFF="OFF"]
+	Switch item=Switch21_BTN1 label="Switch 21 Button 1" mappings=[ON="ON", OFF="OFF"]
+	Switch item=Switch21_BTN2 label="Switch 21 Button 2" mappings=[ON="ON", OFF="OFF"]
+	Switch item=SwitchProjector label="Projector" mappings=[ON="ON", OFF="OFF"]
+	Switch item=onkyoPower label="Home Theater"
+	Slider item=onkyoVolume label="Home Theater Volume"
+        Text item=thermostatColdSetpoint
+   }
+
+ }

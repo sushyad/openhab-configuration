@@ -1,0 +1,104 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.joda.time.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.util.HashMap
+
+var Timer tIndoorLights
+
+/*
+rule sendSwitchCommandOn
+when 
+    Item Switch4_button received command ON
+then
+    sendHttpPutRequest("http://192.168.0.108:8080/api/switches/4", "application/json", "{\"state\": \"ON\"}")
+end
+
+rule sendSwitchCommandOff
+when 
+    Item Switch4_button received command OFF
+then
+    sendHttpPutRequest("http://192.168.0.108:8080/api/switches/4", "application/json", "{\"state\": \"OFF\"}")
+end
+*/
+
+rule sendProjectorCommandOn
+when 
+    Item Projector_button received command ON
+then
+    sendHttpPutRequest("http://192.168.0.108:8080/api/projector", "application/json", "{\"state\": \"ON\"}")
+end
+
+rule sendProjectorCommandOff
+when 
+    Item Projector_button received command OFF
+then
+    sendHttpPutRequest("http://192.168.0.108:8080/api/projector", "application/json", "{\"state\": \"OFF\"}")
+end
+
+rule "At sunset"
+when 
+//    Time cron "0 0 16 * * ?"   // Every day 16:00 hours, evaluate sunset
+    Item sunsetTime received update
+then
+    var year   = now.getYear
+    var month  = now.getMonthOfYear
+    var day    = now.getDayOfMonth
+    var datum  = year + "-" + month + "-" + day + " " + sunsetTime.state
+    logInfo("Sunset", "datum = " + datum)
+    var DateTime sunset = parse(year + "-" + month + "-" + day + "T" + sunsetTime.state)
+    if (sunset.isAfterNow()) {
+    /*
+     * 2nd Foyer Light on Switch4
+     */
+     // Cancel timer to avoid reschedule
+    if(tIndoorLights != null) {
+        logInfo("Sunset", "Timer for '2nd Foyer Light' canceled") 
+        tIndoorLights.cancel()
+    }
+    logInfo("Sunset", "Timer for '2nd Foyer Light' created") 
+
+    tIndoorLights = createTimer(sunset.minusMinutes(15)) [|
+        logInfo("Sunset", "Timer for '2nd Foyer Light' executed") 
+/*        gSunset?.members.forEach(Switch|
+                sendCommand(Switch4, ON)
+        )
+*/
+        sendCommand(Switch4, ON)
+    ]
+    } else {
+        logInfo("Sunset", "Ignoring this sunset update since sun has already set.") 
+    }
+end
+
+rule "At midnight"
+when 
+    Time cron "0 0 0 * * ?"   // Every midnight
+then
+    sendCommand(Switch4, OFF)
+end
+
+rule "When thermostat status changes"
+when 
+    Item thermostatStatus received update
+then
+    logInfo("Thermostat", "Status update " + thermostatStatus.state.toString)
+    var jsonPattern = Pattern::compile("\"(.+?)\":.\"(.+?)\"")
+    var matcher = jsonPattern.matcher(thermostatStatus.state.toString)
+    var thermostatVariableMap = new HashMap
+    while (matcher.find) {
+      var variableName = matcher.group(1)
+      var variableValue = matcher.group(2)
+      thermostatVariableMap.put(variableName, variableValue)
+    }
+
+    var variableId = thermostatVariableMap.get("service") + ":" + thermostatVariableMap.get("variable")
+    thermostatVariableMap.put("variableId", variableId)
+    if (variableId == "urn:upnp-org:serviceId:TemperatureSetpoint1_Cool:CurrentSetpoint") {
+        postUpdate("thermostatColdSetpoint", thermostatVariableMap.get("newValue"))
+    }
+
+    logInfo("Thermostat",  "Status: " + thermostatVariableMap)
+end

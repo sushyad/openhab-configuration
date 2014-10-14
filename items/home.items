@@ -1,0 +1,14 @@
+Number ElectricityUsage "Electricity Usage [%.1f W]" <energy> (zPower) { mqtt="<[localbroker:wsn/electric_meter/power:state:default]"}
+String sunsetTime "Sunset [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:3600000:XSLT(sunset.xsl)]" }
+
+String thermostatStatus
+String thermostatColdSetpoint "Cold setpoint [%s F]" <temperature> { http="<[thermostatStatusCache:120000:XSLT(thermostat_csp.xsl)]"}
+
+Switch Switch4
+Switch Switch21_BTN0 { autoupdate="false" }
+Switch Switch21_BTN1 { autoupdate="false" }
+Switch Switch21_BTN2 { autoupdate="false" }
+Switch SwitchProjector "Projector"
+
+Switch onkyoPower  {onkyo="ON:hometheater:POWER_ON, OFF:hometheater:POWER_OFF"}
+Dimmer onkyoVolume {onkyo="INCREASE:hometheater:VOLUME_UP, DECREASE:hometheater:VOLUME_DOWN"}
