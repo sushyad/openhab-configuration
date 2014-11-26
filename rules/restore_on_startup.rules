@@ -1,0 +1,8 @@
+import org.openhab.core.library.types.*
+import org.openhab.model.script.actions.*
+
+rule "Reload vars workaround"
+when System started
+then
+  executeCommandLine("touch /etc/openhab/configurations/persistence/mongodb.persist")
+end
