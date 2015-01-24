@@ -1,14 +1,33 @@
 Number ElectricityUsage "Electricity Usage [%.1f W]" <energy> (zPower) { mqtt="<[localbroker:wsn/electric_meter/power:state:default]"}
-String sunsetTime "Sunset [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:3600000:XSLT(sunset.xsl)]" }
+String sunriseTime "Sunrise [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:1800000:XSLT(sunrise.xsl)]" }
+String sunsetTime "Sunset [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:1800000:XSLT(sunset.xsl)]" }
 
+Group Temperature_Chart 
 String thermostatStatus
-String thermostatColdSetpoint "Cold setpoint [%s F]" <temperature> { http="<[thermostatStatusCache:120000:XSLT(thermostat_csp.xsl)]"}
+Number thermostatColdSetpoint "Cold setpoint [%s F]" <temperature> { http="<[thermostatStatusCache:120000:XSLT(thermostat_csp.xsl)]"}
+Number thermostatTemperature "Temperature [%s F]" <temperature> (Temperature_Chart) { http="<[thermostatStatusCache:120000:XSLT(thermostat_temp.xsl)]"}
+Number thermostatLRTemperature "Temperature [%s F]" <temperature> (Temperature_Chart) { http="<[thermostatStatusCache:120000:XSLT(thermostat_lr_temp.xsl)]"}
+Number Temperature_Chart_Period "Temperature Chart Period"
 
+Switch Switch1
+Switch Switch2
+Switch Switch3
 Switch Switch4
+Switch Switch5
 Switch Switch21_BTN0 { autoupdate="false" }
 Switch Switch21_BTN1 { autoupdate="false" }
 Switch Switch21_BTN2 { autoupdate="false" }
 Switch SwitchProjector "Projector"
 
+String garageDoorLeft { http="<[http://192.168.0.9/vera/vera_status.xml:120000:XSLT(garage_door_left.xsl)]", autoupdate="false"}
+String garageDoorRight { http="<[http://192.168.0.9/vera/vera_status.xml:120000:XSLT(garage_door_right.xsl)]", autoupdate="false"}
+String garageDoorLeftArmed "Garage Door - Blanca [%s]" { http="<[http://192.168.0.9/vera/vera_status.xml:120000:XSLT(garage_door_left_armed.xsl)]", autoupdate="false"}
+String garageDoorRightArmed "Garage Door - Susheel [%s]" { http="<[http://192.168.0.9/vera/vera_status.xml:120000:XSLT(garage_door_right_armed.xsl)]", autoupdate="false"}
+
 Switch onkyoPower  {onkyo="ON:hometheater:POWER_ON, OFF:hometheater:POWER_OFF"}
 Dimmer onkyoVolume {onkyo="INCREASE:hometheater:VOLUME_UP, DECREASE:hometheater:VOLUME_DOWN"}
+
+String dryer "Dryer [%s]" { http="<[http://192.168.0.108:8080/api/dryer/state:600000:REGEX((.*))]" }
+
+Switch  PresenceSusheel_Home   "Susheel @ Home"   { mqttitude="securebroker:location/susheel:home" }
+Switch  PresenceSusheel_Work   "Susheel @ Work"   { mqttitude="securebroker:location/susheel:work" }
