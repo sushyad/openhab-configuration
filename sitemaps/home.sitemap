@@ -34,10 +34,8 @@ sitemap home label="Main Menu" {
         Switch item=Switch21_BTN1 label="Switch 21 Button 1"
         Switch item=Switch21_BTN2 label="Switch 21 Button 2"
         Switch item=SwitchProjector label="Projector"
-        Switch item=garageDoorLeft label="Garage Door - Blanca"  mappings=[0="Closed", 1="Open"]
-        Switch item=garageDoorRight label="Garage Door - Susheel"  mappings=[0="Closed", 1="Open"]
-        Switch item=garageDoorLeftArmed label="Garage Door Armed - Blanca" mappings=[0="Disabled", 1="Active"]
-        Switch item=garageDoorRightArmed label="Garage Door Armed - Susheel" mappings=[0="Disabled", 1="Active"]
+        Switch item=garageDoorLeft label="Garage Door - Blanca" mappings=[ON="OPEN", OFF="CLOSED"]
+        Switch item=garageDoorRight label="Garage Door - Susheel"
         Switch item=Switch1 label="HT Power Strip"
         Switch item=onkyoPower label="Home Theater"
         Slider item=onkyoVolume label="Home Theater Volume"
