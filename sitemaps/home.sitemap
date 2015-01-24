@@ -1,37 +1,51 @@
 sitemap home label="Main Menu" {
 
-   Frame {
+    Frame {
+
+        Text	item=ThermostatUpstairsCurrentTemperature {
+            Setpoint item=ThermostatUpstairsHeatCurrentSetpoint minValue=40 maxValue=80
+            Setpoint item=ThermostatUpstairsCoolCurrentSetpoint minValue=40 maxValue=80
+            Switch   item=ThermostatUpstairsFanMode mappings=[ContinuousOn="On", Auto="Auto"]
+            Text     item=ThermostatUpstairsFanStatus
+            Switch   item=ThermostatUpstairsModeStatus mappings=[HeatOn="Heat", CoolOn="Cool", AutoChangeOver="Auto", Off="Off"]
+            Text     item=ThermostatOfficeModeState
+        }
+
+        Text	item=ThermostatOfficeCurrentTemperature {
+            Text     item=ThermostatOfficeHumidityCurrentLevel
+            Setpoint item=ThermostatOfficeHeatCurrentSetpoint minValue=40 maxValue=80
+            Setpoint item=ThermostatOfficeCoolCurrentSetpoint minValue=40 maxValue=80
+            Switch   item=ThermostatOfficeFanMode mappings=[ContinuousOn="On", Auto="Auto"]
+            Text     item=ThermostatOfficeFanStatus
+            Switch   item=ThermostatOfficeModeStatus mappings=[HeatOn="Heat", CoolOn="Cool", AutoChangeOver="Auto", Off="Off"]
+            Text     item=ThermostatOfficeModeState
+            Text     item=ThermostatOfficeBatteryLevel
+            Text     item=ThermostatOfficeBatteryDate
+        }
+
         Text item=ElectricityUsage
         Text item=sunriseTime
         Text item=sunsetTime
-	Switch item=Switch4 label="2nd Foyer Light"
-	Switch item=Switch2 label="Switch #2"
-	Switch item=Switch3 label="Switch #3"
-	Switch item=Switch21_BTN0 label="Switch 21 Button 0"
-	Switch item=Switch21_BTN1 label="Switch 21 Button 1"
-	Switch item=Switch21_BTN2 label="Switch 21 Button 2"
-	Switch item=SwitchProjector label="Projector"
-	Switch item=garageDoorLeft label="Garage Door - Blanca"  mappings=[0="Closed", 1="Open"]
-	Switch item=garageDoorRight label="Garage Door - Susheel"  mappings=[0="Closed", 1="Open"]
-	Switch item=garageDoorLeftArmed label="Garage Door Armed - Blanca" mappings=[0="Disabled", 1="Active"]
-	Switch item=garageDoorRightArmed label="Garage Door Armed - Susheel" mappings=[0="Disabled", 1="Active"]
-	Switch item=Switch1 label="HT Power Strip"
-	Switch item=onkyoPower label="Home Theater"
-	Slider item=onkyoVolume label="Home Theater Volume"
-        Text item=thermostatTemperature
-        Text item=thermostatLRTemperature
-	Switch item=Temperature_Chart_Period label="Chart Period" mappings=[0="Hour", 1="Day", 2="Week"]
-	Chart item=thermostatTemperature period=h refresh=300 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
-	Chart item=thermostatTemperature period=D refresh=1800 visibility=[Temperature_Chart_Period==1]
-	Chart item=thermostatTemperature period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
-	Chart item=thermostatLRTemperature period=h refresh=300 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
-	Chart item=thermostatLRTemperature period=D refresh=1800 visibility=[Temperature_Chart_Period==1]
-	Chart item=thermostatLRTemperature period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
 
-        Text item=thermostatColdSetpoint
+        Switch item=Switch4 label="2nd Foyer Light"
+        Switch item=Switch2 label="Switch #2"
+        Switch item=Switch3 label="Switch #3"
+        Switch item=Switch21_BTN0 label="Switch 21 Button 0"
+        Switch item=Switch21_BTN1 label="Switch 21 Button 1"
+        Switch item=Switch21_BTN2 label="Switch 21 Button 2"
+        Switch item=SwitchProjector label="Projector"
+        Switch item=garageDoorLeft label="Garage Door - Blanca"  mappings=[0="Closed", 1="Open"]
+        Switch item=garageDoorRight label="Garage Door - Susheel"  mappings=[0="Closed", 1="Open"]
+        Switch item=garageDoorLeftArmed label="Garage Door Armed - Blanca" mappings=[0="Disabled", 1="Active"]
+        Switch item=garageDoorRightArmed label="Garage Door Armed - Susheel" mappings=[0="Disabled", 1="Active"]
+        Switch item=Switch1 label="HT Power Strip"
+        Switch item=onkyoPower label="Home Theater"
+        Slider item=onkyoVolume label="Home Theater Volume"
+
         Text item=dryer
 
         Switch item=PresenceSusheel_Work label="Is Susheel Work?"
         Switch item=PresenceSusheel_Home label="Is Susheel Home?"
-   }
- }
+    }
+}
+

@@ -31,3 +31,28 @@ String dryer "Dryer [%s]" { http="<[http://192.168.0.108:8080/api/dryer/state:60
 
 Switch  PresenceSusheel_Home   "Susheel @ Home"   { mqttitude="securebroker:location/susheel:home" }
 Switch  PresenceSusheel_Work   "Susheel @ Work"   { mqttitude="securebroker:location/susheel:work" }
+
+Number   ThermostatUpstairsId "ID [%d]" {mios="unit:house,device:7/id"}
+String   ThermostatUpstairsDeviceStatus "Device Status [%s]" (GThermostatUpstairs) {mios="unit:house,device:7/status"}
+Number   ThermostatUpstairsCurrentTemperature "Upstairs Temperature [%.1f F]" <temperature> (GThermostatUpstairs, GTemperature) {mios="unit:house,device:7/service/TemperatureSensor1/CurrentTemperature"}
+Number   ThermostatUpstairsHeatCurrentSetpoint "Heat Setpoint [%.1f F]" <temperature> (GThermostatUpstairs) {mios="unit:house,device:7/service/TemperatureSetpoint1_Heat/CurrentSetpoint"}
+Number   ThermostatUpstairsCoolCurrentSetpoint "Cool Setpoint [%.1f F]" <temperature> (GThermostatUpstairs) {mios="unit:house,device:7/service/TemperatureSetpoint1_Cool/CurrentSetpoint"}
+String   ThermostatUpstairsFanMode "Fan Mode" (GThermostatUpstairs) {mios="unit:house,device:7/service/HVAC_FanOperatingMode1/Mode"}
+String   ThermostatUpstairsFanStatus "Fan Status [%s]" (GThermostatUpstairs) {mios="unit:house,device:7/service/HVAC_FanOperatingMode1/FanStatus"}
+String   ThermostatUpstairsModeStatus "Mode Status" (GThermostatUpstairs) {mios="unit:house,device:7/service/HVAC_UserOperatingMode1/ModeStatus"}
+String   ThermostatUpstairsModeState "Mode State [%s]" (GThermostatUpstairs) {mios="unit:house,device:7/service/HVAC_OperatingState1/ModeState"}
+Number   ThermostatUpstairsBatteryLevel "Battery Level [%d] %" (GThermostatUpstairs) {mios="unit:house,device:7/service/HaDevice1/BatteryLevel"}
+
+Number   ThermostatOfficeId "ID [%d]" {mios="unit:house,device:13/id"}
+String   ThermostatOfficeDeviceStatus "Device Status [%s]" (GThermostatOffice) {mios="unit:house,device:13/status"}
+Number   ThermostatOfficeHumidityCurrentLevel "Office Humidity [%.1f]" (GThermostatOffice, GTemperature) {mios="unit:house,device:15/service/HumiditySensor1/CurrentLevel"}
+Number   ThermostatOfficeCurrentTemperature "Office Temperature [%.1f F]" <temperature> (GThermostatOffice, GTemperature) {mios="unit:house,device:13/service/TemperatureSensor1/CurrentTemperature"}
+Number   ThermostatOfficeHeatCurrentSetpoint "Heat Setpoint [%.1f F]" <temperature> (GThermostatOffice) {mios="unit:house,device:13/service/TemperatureSetpoint1_Heat/CurrentSetpoint"}
+Number   ThermostatOfficeCoolCurrentSetpoint "Cool Setpoint [%.1f F]" <temperature> (GThermostatOffice) {mios="unit:house,device:13/service/TemperatureSetpoint1_Cool/CurrentSetpoint"}
+String   ThermostatOfficeFanMode "Fan Mode" (GThermostatOffice) {mios="unit:house,device:13/service/HVAC_FanOperatingMode1/Mode"}
+String   ThermostatOfficeFanStatus "Fan Status [%s]" (GThermostatOffice) {mios="unit:house,device:13/service/HVAC_FanOperatingMode1/FanStatus"}
+String   ThermostatOfficeModeStatus "Mode Status" (GThermostatOffice) {mios="unit:house,device:13/service/HVAC_UserOperatingMode1/ModeStatus"}
+String   ThermostatOfficeModeState "Mode State [%s]" (GThermostatOffice) {mios="unit:house,device:13/service/HVAC_OperatingState1/ModeState"}
+Number   ThermostatOfficeBatteryLevel "Battery Level [%d] %" (GThermostatOffice) {mios="unit:house,device:13/service/HaDevice1/BatteryLevel"}
+DateTime ThermostatOfficeBatteryDate "Battery Date [%1$ta, %1$tm/%1$te %1$tR]" <calendar> (GThermostatOffice) {mios="unit:house,device:13/service/HaDevice1/BatteryDate"}
+DateTime ThermostatOfficeLastUpdate "Last Update [%1$ta, %1$tm/%1$te %1$tR]" <calendar> (GThermostatOffice) {mios="unit:house,device:13/service/HaDevice1/LastUpdate"}
