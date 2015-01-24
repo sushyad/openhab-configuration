@@ -46,9 +46,12 @@ then
     var year   = now.getYear
     var month  = now.getMonthOfYear
     var day    = now.getDayOfMonth
+    if (month < 10) month = '0' + month
+    if (day < 10) day = '0' + day
     var datum  = year + "-" + month + "-" + day + " " + sunsetTime.state
     logInfo("Sunset", "datum = " + datum)
     var DateTime sunset = parse(year + "-" + month + "-" + day + "T" + sunsetTime.state)
+    var DateTime sunrise = parse(year + "-" + month + "-" + day + "T" + sunriseTime.state)
     if (sunset.isAfterNow()) {
     /*
      * 2nd Foyer Light on Switch4
@@ -59,13 +62,16 @@ then
         tIndoorLights.cancel()
     }
     logInfo("Sunset", "Timer for '2nd Foyer Light' created") 
-
-    tIndoorLights = createTimer(sunset.minusMinutes(15)) [|
+    var lengthOfDayInHrs = (sunset.getMinuteOfDay() - sunrise.getMinuteOfDay()) / 60
+    logInfo("Sunset", "Length of day: " + lengthOfDayInHrs + " hrs")
+    tIndoorLights = createTimer(sunset.minusMinutes(45 * (lengthOfDayInHrs / 9))) [|
         logInfo("Sunset", "Timer for '2nd Foyer Light' executed") 
 /*        gSunset?.members.forEach(Switch|
                 sendCommand(Switch4, ON)
         )
 */
+        sendCommand(Switch2, ON)
+        sendCommand(Switch3, ON)
         sendCommand(Switch4, ON)
     ]
     } else {
@@ -77,6 +83,8 @@ rule "At midnight"
 when 
     Time cron "0 0 0 * * ?"   // Every midnight
 then
+    sendCommand(Switch2, OFF)
+    sendCommand(Switch3, OFF)
     sendCommand(Switch4, OFF)
 end
 
@@ -102,3 +110,76 @@ then
 
     logInfo("Thermostat",  "Status: " + thermostatVariableMap)
 end
+
+rule "When dryer status changes"
+when
+    Item dryer changed from ON to OFF
+then
+    logInfo("Dryer", "Status update " + dryer.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Dryer', 'Dryer turned OFF', 1, '', false);
+end
+
+rule "When left garage door opens"
+when
+    Item garageDoorLeft changed from 0 to 1
+then
+    logInfo("GarageDoorLeft", "Status update " + garageDoorLeft.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Opened', 1, '', false);
+end
+
+rule "When left garage door closes"
+when
+    Item garageDoorLeft changed from 1 to 0
+then
+    logInfo("GarageDoorLeft", "Status update " + garageDoorLeft.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Closed', 1, '', false);
+end
+
+rule "When right garage door opens"
+when
+    Item garageDoorRight changed from 0 to 1
+then
+    logInfo("GarageDoorRight", "Status update " + garageDoorRight.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Opened', 1, '', false);
+end
+
+rule "When right garage door closes"
+when
+    Item garageDoorRight changed from 1 to 0
+then
+    logInfo("GarageDoorRight", "Status update " + garageDoorRight.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Closed', 1, '', false);
+end
+
+rule "When left garage door sensor is armed"
+when
+    Item garageDoorLeftArmed changed from 0 to 1
+then
+    logInfo("GarageDoorLeftArmed", "Status update " + garageDoorLeftArmed.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Armed', 1, '', false);
+end
+
+rule "When left garage door sensor is disabled"
+when
+    Item garageDoorLeftArmed changed from 1 to 0
+then
+    logInfo("GarageDoorLeftArmed", "Status update " + garageDoorLeftArmed.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Disabled', 1, '', false);
+end
+
+rule "When right garage door sensor is armed"
+when
+    Item garageDoorRightArmed changed from 0 to 1
+then
+    logInfo("GarageDoorRightArmed", "Status update " + garageDoorRightArmed.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Armed', 1, '', false);
+end
+
+rule "When right garage door sensor is disabled"
+when
+    Item garageDoorRightArmed changed from 1 to 0
+then
+    logInfo("GarageDoorRightArmed", "Status update " + garageDoorRightArmed.state.toString)
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Disabled', 1, '', false);
+end
+
