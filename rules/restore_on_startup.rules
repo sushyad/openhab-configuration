@@ -5,4 +5,8 @@ rule "Reload vars workaround"
 when System started
 then
   executeCommandLine("touch /etc/openhab/configurations/persistence/mongodb.persist")
+  postUpdate("ThermostatUpstairsHeatSetpointWhenOn", "64")
+  postUpdate("ThermostatUpstairsHeatSetpointWhenOff", "56")
+  postUpdate("ThermostatOfficeHeatSetpointWhenOn", "64")
+  postUpdate("ThermostatOfficeHeatSetpointWhenOff", "56")
 end

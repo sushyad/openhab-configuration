@@ -3,16 +3,31 @@ sitemap home label="Main Menu" {
     Frame {
 
         Text	item=ThermostatUpstairsCurrentTemperature {
-            Setpoint item=ThermostatUpstairsHeatCurrentSetpoint minValue=40 maxValue=80
+            Text label="Heat Setpoint Settings" icon="temperature" {
+              Setpoint item=ThermostatUpstairsHeatSetpointWhenOn minValue=60 maxValue=68
+              Setpoint item=ThermostatUpstairsHeatSetpointWhenOff minValue=52 maxValue=60
+            }
+            Setpoint item=ThermostatUpstairsHeatCurrentSetpoint minValue=40 maxValue=80 {
             Setpoint item=ThermostatUpstairsCoolCurrentSetpoint minValue=40 maxValue=80
             Switch   item=ThermostatUpstairsFanMode mappings=[ContinuousOn="On", Auto="Auto"]
             Text     item=ThermostatUpstairsFanStatus
             Switch   item=ThermostatUpstairsModeStatus mappings=[HeatOn="Heat", CoolOn="Cool", AutoChangeOver="Auto", Off="Off"]
-            Text     item=ThermostatOfficeModeState
+            Text     item=ThermostatUpstairsModeState
+
+            Switch   item=Temperature_Chart_Period label="Chart Period" mappings=[0="Hour", 1="Day", 2="Week"]
+            Chart    item=ThermostatUpstairsCurrentTemperature period=h refresh=300 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
+            Chart    item=ThermostatUpstairsCurrentTemperature period=D refresh=1800 visibility=[Temperature_Chart_Period==1]
+            Chart    item=ThermostatUpstairsCurrentTemperature period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
         }
 
         Text	item=ThermostatOfficeCurrentTemperature {
+            Text label="Heat Setpoint Settings" icon="temperature" {
+              Setpoint item=ThermostatOfficeHeatSetpointWhenOn minValue=60 maxValue=68
+              Setpoint item=ThermostatOfficeHeatSetpointWhenOff minValue=52 maxValue=60
+            }
             Text     item=ThermostatOfficeHumidityCurrentLevel
+            Setpoint item=ThermostatOfficeHeatSetpointWhenOn minValue=60 maxValue=68
+            Setpoint item=ThermostatOfficeHeatSetpointWhenOff minValue=52 maxValue=60
             Setpoint item=ThermostatOfficeHeatCurrentSetpoint minValue=40 maxValue=80
             Setpoint item=ThermostatOfficeCoolCurrentSetpoint minValue=40 maxValue=80
             Switch   item=ThermostatOfficeFanMode mappings=[ContinuousOn="On", Auto="Auto"]
@@ -21,7 +36,20 @@ sitemap home label="Main Menu" {
             Text     item=ThermostatOfficeModeState
             Text     item=ThermostatOfficeBatteryLevel
             Text     item=ThermostatOfficeBatteryDate
+
+            Switch   item=Temperature_Chart_Period label="Chart Period" mappings=[0="Hour", 1="Day", 2="Week"]
+            Chart    item=ThermostatOfficeCurrentTemperature period=h refresh=300 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
+            Chart    item=ThermostatOfficeCurrentTemperature period=D refresh=1800 visibility=[Temperature_Chart_Period==1]
+            Chart    item=ThermostatOfficeCurrentTemperature period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
         }
+
+        Switch item=MusicPlayLivingRoom mappings=[ON="Play", OFF="Pause"]
+        Slider item=MusicVolumeLivingRoom switchSupport
+        Text item=MusicTitleLivingRoom
+
+        Switch item=MusicPlayOffice mappings=[ON="Play", OFF="Pause"]
+        Slider item=MusicVolumeOffice switchSupport
+        Text item=MusicTitleOffice
 
         Text item=ElectricityUsage
         Text item=sunriseTime
@@ -42,8 +70,15 @@ sitemap home label="Main Menu" {
 
         Text item=dryer
 
-        Switch item=PresenceSusheel_Work label="Is Susheel Work?"
-        Switch item=PresenceSusheel_Home label="Is Susheel Home?"
+        Switch item=SomeoneIsAwake label="Is somebody awake?" mappings=[ON="Yes", OFF="No"]
+        Switch item=Presence label="Is somebody home?" mappings=[ON="Yes", OFF="No"]
+        Switch item=PresenceSusheel_Work label="Is Susheel at work?" mappings=[ON="Yes", OFF="No"]
+        Switch item=PresenceSusheel_Home label="Is Susheel home?" mappings=[ON="Yes", OFF=No""]
+        Switch item=PresenceBlanca_Work label="Is Blanca at work?" mappings=[ON="Yes", OFF="No"]
+        Switch item=PresenceBlanca_Home label="Is Blanca home?" mappings=[ON="Yes", OFF="No"]
+
+        Switch item=phoneBlanca label="Blanca Home" mappings=[ON="Yes", OFF="No"]
+        Switch item=phoneSusheel label="Susheel Home" mappings=[ON="Yes", OFF="No"]
     }
 }
 

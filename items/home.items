@@ -1,12 +1,12 @@
+Group gPresenceHome
+Group gPresenceWork
+Group gMobiles
+
 Number ElectricityUsage "Electricity Usage [%.1f W]" <energy> (zPower) { mqtt="<[localbroker:wsn/electric_meter/power:state:default]"}
 String sunriseTime "Sunrise [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:1800000:XSLT(sunrise.xsl)]" }
 String sunsetTime "Sunset [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:1800000:XSLT(sunset.xsl)]" }
 
 Group Temperature_Chart 
-String thermostatStatus
-Number thermostatColdSetpoint "Cold setpoint [%s F]" <temperature> { http="<[thermostatStatusCache:120000:XSLT(thermostat_csp.xsl)]"}
-Number thermostatTemperature "Temperature [%s F]" <temperature> (Temperature_Chart) { http="<[thermostatStatusCache:120000:XSLT(thermostat_temp.xsl)]"}
-Number thermostatLRTemperature "Temperature [%s F]" <temperature> (Temperature_Chart) { http="<[thermostatStatusCache:120000:XSLT(thermostat_lr_temp.xsl)]"}
 Number Temperature_Chart_Period "Temperature Chart Period"
 
 Switch Switch1
@@ -27,8 +27,14 @@ Dimmer onkyoVolume {onkyo="INCREASE:hometheater:VOLUME_UP, DECREASE:hometheater:
 
 String dryer "Dryer [%s]" { http="<[http://192.168.0.108:8080/api/dryer/state:600000:REGEX((.*))]" }
 
-Switch  PresenceSusheel_Home   "Susheel @ Home"   { mqttitude="securebroker:location/susheel:home" }
-Switch  PresenceSusheel_Work   "Susheel @ Work"   { mqttitude="securebroker:location/susheel:work" }
+Switch  Presence
+Switch  SomeoneIsAwake
+Switch  PresenceSusheel_Home   "Susheel @ Home" (gPresenceHome) { mqttitude="securebroker:location/susheel:home", autoupdate="false" }
+Switch  PresenceSusheel_Work   "Susheel @ Work" (gPresenceWork) { mqttitude="securebroker:location/susheel:work", autoupdate="false" }
+Switch  PresenceBlanca_Home   "Blanca @ Home" (gPresenceHome) { mqttitude="securebroker:location/blanca:home", autoupdate="false" }
+Switch  PresenceBlanca_Work   "Blanca @ Work" (gPresenceWork) { mqttitude="securebroker:location/blanca:work", autoupdate="false" }
+Switch  phoneBlanca (gMobiles) {nh="192.168.0.6"}
+Switch  phoneSusheel (gMobiles) {nh="192.168.0.7"}
 
 Number   ThermostatUpstairsId "ID [%d]" {mios="unit:house,device:7/id"}
 String   ThermostatUpstairsDeviceStatus "Device Status [%s]" (GThermostatUpstairs) {mios="unit:house,device:7/status"}
@@ -40,11 +46,14 @@ String   ThermostatUpstairsFanStatus "Fan Status [%s]" (GThermostatUpstairs) {mi
 String   ThermostatUpstairsModeStatus "Mode Status" (GThermostatUpstairs) {mios="unit:house,device:7/service/HVAC_UserOperatingMode1/ModeStatus"}
 String   ThermostatUpstairsModeState "Mode State [%s]" (GThermostatUpstairs) {mios="unit:house,device:7/service/HVAC_OperatingState1/ModeState"}
 Number   ThermostatUpstairsBatteryLevel "Battery Level [%d] %" (GThermostatUpstairs) {mios="unit:house,device:7/service/HaDevice1/BatteryLevel"}
+Number   ThermostatUpstairsSetpoint
+Number   ThermostatUpstairsHeatSetpointWhenOn  "Heat Setpoint When On [%.1f F]" <temperature>
+Number   ThermostatUpstairsHeatSetpointWhenOff  "Heat Setpoint When Off [%.1f F]" <temperature>
 
 Number   ThermostatOfficeId "ID [%d]" {mios="unit:house,device:13/id"}
 String   ThermostatOfficeDeviceStatus "Device Status [%s]" (GThermostatOffice) {mios="unit:house,device:13/status"}
 Number   ThermostatOfficeHumidityCurrentLevel "Office Humidity [%.1f]" (GThermostatOffice, GTemperature) {mios="unit:house,device:15/service/HumiditySensor1/CurrentLevel"}
-Number   ThermostatOfficeCurrentTemperature "Office Temperature [%.1f F]" <temperature> (GThermostatOffice, GTemperature) {mios="unit:house,device:13/service/TemperatureSensor1/CurrentTemperature"}
+Number   ThermostatOfficeCurrentTemperature "Office Temperature [%.1f F]" <temperature> (GThermostatOffice, GTemperature, Temperature_Chart) {mios="unit:house,device:13/service/TemperatureSensor1/CurrentTemperature"}
 Number   ThermostatOfficeHeatCurrentSetpoint "Heat Setpoint [%.1f F]" <temperature> (GThermostatOffice) {mios="unit:house,device:13/service/TemperatureSetpoint1_Heat/CurrentSetpoint"}
 Number   ThermostatOfficeCoolCurrentSetpoint "Cool Setpoint [%.1f F]" <temperature> (GThermostatOffice) {mios="unit:house,device:13/service/TemperatureSetpoint1_Cool/CurrentSetpoint"}
 String   ThermostatOfficeFanMode "Fan Mode" (GThermostatOffice) {mios="unit:house,device:13/service/HVAC_FanOperatingMode1/Mode"}
@@ -54,3 +63,16 @@ String   ThermostatOfficeModeState "Mode State [%s]" (GThermostatOffice) {mios="
 Number   ThermostatOfficeBatteryLevel "Battery Level [%d] %" (GThermostatOffice) {mios="unit:house,device:13/service/HaDevice1/BatteryLevel"}
 DateTime ThermostatOfficeBatteryDate "Battery Date [%1$ta, %1$tm/%1$te %1$tR]" <calendar> (GThermostatOffice) {mios="unit:house,device:13/service/HaDevice1/BatteryDate"}
 DateTime ThermostatOfficeLastUpdate "Last Update [%1$ta, %1$tm/%1$te %1$tR]" <calendar> (GThermostatOffice) {mios="unit:house,device:13/service/HaDevice1/LastUpdate"}
+Number   ThermostatOfficeSetpoint
+Number   ThermostatOfficeHeatSetpointWhenOn  "Heat Setpoint When On [%.1f F]" <temperature>
+Number   ThermostatOfficeHeatSetpointWhenOff  "Heat Setpoint When Off [%.1f F]" <temperature>
+
+Dimmer MusicVolumeLivingRoom      "Volume LR [%.1f %%]" { squeeze="LivingRoom:volume" }
+String MusicTitleLivingRoom       "Title LR [%s]"     { squeeze="LivingRoom:title" }
+Switch MusicPlayLivingRoom        "Play LR"       { squeeze="LivingRoom:play" }
+Switch MusicSyncLivingRoom        "Sync Office"       { squeeze="LivingRoom:sync:Office" }
+
+Dimmer MusicVolumeOffice      "Volume Office [%.1f %%]" { squeeze="Office:volume" }
+String MusicTitleOffice       "Title Office [%s]"     { squeeze="Office:title" }
+Switch MusicPlayOffice        "Play Office"       { squeeze="Office:play" }
+Switch MusicSyncOffice        "Sync LR"       { squeeze="Office:sync:LivingRoom" }

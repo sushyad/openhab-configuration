@@ -8,21 +8,79 @@ import java.util.HashMap
 
 var Timer tIndoorLights
 
-/*
 rule sendSwitchCommandOn
 when 
-    Item Switch4_button received command ON
+    Item Switch2 received command ON
 then
-    sendHttpPutRequest("http://192.168.0.108:8080/api/switches/4", "application/json", "{\"state\": \"ON\"}")
+    squeezeboxSpeak("Office", "Switch turned on. Switch turned on. Switch turned on.")
 end
 
 rule sendSwitchCommandOff
 when 
-    Item Switch4_button received command OFF
+    Item Switch2 received command OFF
 then
-    sendHttpPutRequest("http://192.168.0.108:8080/api/switches/4", "application/json", "{\"state\": \"OFF\"}")
+    squeezeboxSpeak("Office", "Switch turned off. Switch turned off. Switch turned off.")
 end
-*/
+
+rule BlancaReachedHome
+when
+    Item PresenceBlanca_Home changed from OFF to ON
+then
+    logInfo("Presence", "Blanca about to reach home")
+    squeezeboxSpeak("Office", "Blanca is about to reach home. Blanca is about to reach home.")
+    squeezeboxSpeak("LivingRoom", "Blanca is about to reach home. Blanca is about to reach home.")
+
+    if (Presence.state != ON) sendCommand(Presence, ON)
+end
+
+rule BlancaLeftHome
+when
+    Item PresenceBlanca_Home changed from ON to OFF
+then
+    logInfo("Presence", "Blanca left home")
+    if (garageDoorLeft.state == ON) {
+        notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Left open', 1, '', false)
+        sendCommand(garageDoorLeft, OFF)
+    }
+
+    if(gPresenceHome.members.filter(s | s.state == ON).size == 0) {
+        logInfo("PresenceCheck", "No phone within reach, checking for flapping")
+        if(gPresenceHome.members.filter(s | s.changedSince(now.minusMinutes(5))).size == 0) {
+            logInfo("PresenceCheck", "Nobody is at home")
+            sendCommand(Presence, OFF)
+        }
+    }
+end
+
+rule SusheelReachedHome
+when
+    Item PresenceSusheel_Home changed from OFF to ON
+then
+    logInfo("Presence", "Susheel about to reach home")
+    squeezeboxSpeak("Office", "Susheel is about to reach home. Susheel is about to reach home.")
+    squeezeboxSpeak("LivingRoom", "Susheel is about to reach home. Susheel is about to reach home.")
+
+    if (Presence.state != ON) sendCommand(Presence, ON)
+end
+
+rule SusheelLeftHome
+when
+    Item PresenceSusheel_Home changed from ON to OFF
+then
+    logInfo("Presence", "Susheel left home")
+    if (garageDoorRight.state == ON) {
+        notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Left open', 1, '', false)
+        sendCommand(garageDoorRight, OFF)
+    }
+
+    if(gPresenceHome.members.filter(s | s.state == ON).size == 0) {
+        logInfo("PresenceCheck", "No phone within reach, checking for flapping")
+        if(gPresenceHome.members.filter(s | s.changedSince(now.minusMinutes(5))).size == 0) {
+            logInfo("PresenceCheck", "Nobody is at home")
+            sendCommand(Presence, OFF)
+        }
+    }
+end
 
 rule sendProjectorCommandOn
 when 
@@ -40,7 +98,6 @@ end
 
 rule "At sunset"
 when 
-//    Time cron "0 0 16 * * ?"   // Every day 16:00 hours, evaluate sunset
     Item sunsetTime received update
 then
     var year   = now.getYear
@@ -116,39 +173,67 @@ when
     Item dryer changed from ON to OFF
 then
     logInfo("Dryer", "Status update " + dryer.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Dryer', 'Dryer turned OFF', 1, '', false);
+    squeezeboxSpeak("Office", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
+    squeezeboxSpeak("LivingRoom", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Dryer', 'Dryer turned OFF', 1, '', false)
 end
 
 rule "When left garage door opens"
 when
-    Item garageDoorLeft changed from 0 to 1
+    Item garageDoorLeft changed from OFF to ON
 then
-    logInfo("GarageDoorLeft", "Status update " + garageDoorLeft.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Opened', 1, '', false);
+    logInfo("GarageDoorLeft", "Opened")
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Opened', 1, '', false)
+    squeezeboxSpeak("LivingRoom", "Left garage door opened. Left garage door opened.")
+    squeezeboxSpeak("Office", "Left garage door opened. Left garage door opened.")
+
+    createTimer(now.plusMinutes(3)) [|
+        if (garageDoorLeft.state == ON) {
+          logInfo("Garage Door - Blanca", "Left Open")
+          notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Left open', 1, '', false)
+          squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
+          squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
+          //sendCommand(garageDoorLeft, OFF)
+        }
+    ]
 end
 
 rule "When left garage door closes"
 when
-    Item garageDoorLeft changed from 1 to 0
+    Item garageDoorLeft changed from ON to OFF
 then
-    logInfo("GarageDoorLeft", "Status update " + garageDoorLeft.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Closed', 1, '', false);
+    logInfo("GarageDoorLeft", "Closed")
+    squeezeboxSpeak('LivingRoom', 'Left garage door closed')
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Closed', 1, '', false)
 end
 
 rule "When right garage door opens"
 when
-    Item garageDoorRight changed from 0 to 1
+    Item garageDoorRight changed from OFF to ON
 then
-    logInfo("GarageDoorRight", "Status update " + garageDoorRight.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Opened', 1, '', false);
+    logInfo("GarageDoorRight", "Opened")
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Opened', 1, '', false)
+    squeezeboxSpeak("LivingRoom", "Right garage door opened. Right garage door opened.")
+    squeezeboxSpeak("Office", "Right garage door opened. Right garage door opened.")
+
+    createTimer(now.plusMinutes(3)) [|
+        if (garageDoorLeft.state == ON) {
+          logInfo("Garage Door - Susheel", "Left Open")
+          notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Left open', 1, '', false)
+          squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
+          squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
+          //sendCommand(garageDoorRight, OFF)
+        }
+    ]
 end
 
 rule "When right garage door closes"
 when
-    Item garageDoorRight changed from 1 to 0
+    Item garageDoorRight changed from ON to OFF
 then
     logInfo("GarageDoorRight", "Status update " + garageDoorRight.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Closed', 1, '', false);
+    squeezeboxSpeak("LivingRoom", "Right garage door closed. Right garage door closed.")
+    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Closed', 1, '', false)
 end
 
 rule "When left garage door sensor is armed"
@@ -181,5 +266,121 @@ when
 then
     logInfo("GarageDoorRightArmed", "Status update " + garageDoorRightArmed.state.toString)
     notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Disabled', 1, '', false);
+end
+
+rule "Periodically check presence"
+when
+    Time cron "0 * * * * ?"
+then
+    logInfo("Presence", "Checking presence...")
+
+    if (Presence.state == ON) {
+      if(gMobiles.members.filter(s | s.state == ON).size == 0) {
+        logInfo("PresenceCheck", "No phone within reach, checking for flapping")
+        if(gMobiles.members.filter(s | s.changedSince(now.minusMinutes(5))).size == 0) {
+          logInfo("PresenceCheck", "Nobody is at home")
+          sendCommand(Presence, OFF)
+        }
+      } else {
+        sendCommand(Presence, ON)
+      }
+    } else {
+      //For initialization. If Presence is undefined or off, although it should be on.
+      if(gMobiles.members.filter(s | s.state == ON).size > 0) {
+        sendCommand(Presence, ON)
+      } else if (Presence.state == Undefined || Presence.state == Uninitialized) {
+        sendCommand(Presence, OFF)
+      }
+    }
+
+end
+
+rule "Waking up rule for weekdays"
+when
+    Time cron "0 6 6 ? * MON-FRI"
+then
+    logInfo("Wakeup", "Waking up on weekdays...")    
+    postUpdate("SomeoneIsAwake", "ON")
+end
+
+rule "Waking up rule for weekends"
+when
+    Time cron "0 0 7 ? * SAT-SUN"
+then
+    logInfo("Wakeup", "Waking up on weekends...")
+    postUpdate("SomeoneIsAwake", "ON")
+end
+
+rule "Going to bed rule for weekdays"
+when
+    Time cron "0 0 22 ? * SUN-THU"
+then
+    logInfo("Bedtime", "Going to bed on weekdays...")
+    postUpdate("SomeoneIsAwake", "OFF")
+end
+
+rule "Going to bed rule for weekends"
+when
+    Time cron "0 0 23 ? * FRI-SAT"
+then
+    logInfo("Bedtime", "Going to bed on weekend...")
+    postUpdate("SomeoneIsAwake", "OFF")
+end
+
+rule SomeoneReachedHome
+when
+    Item Presence received command ON
+then
+    var Number hourOfDay = now.getHourOfDay()
+    logInfo("Presence", "Someone is home")
+    logInfo("Presence", "ThermostatUpstairsHeatSetpointWhenOn " + ThermostatUpstairsHeatSetpointWhenOn.state.toString())
+
+    if (SomeoneIsAwake.state == ON) {
+      postUpdate("ThermostatUpstairsSetpoint", "64")
+      postUpdate("ThermostatOfficeSetpoint", "64")
+    } else {
+      postUpdate("ThermostatUpstairsSetpoint", "55")
+      postUpdate("ThermostatOfficeSetpoint", "55")
+    }
+end
+
+rule EverybodyLeftHome
+when
+    Item Presence received command OFF
+then
+    logInfo("Presence", "Everybody left home")
+    postUpdate("ThermostatUpstairsSetpoint", "55")
+    postUpdate("ThermostatOfficeSetpoint", "55")
+end
+
+rule ThermostatUpstairsSetpointUpdate
+when
+    Item ThermostatUpstairsSetpoint received update
+then
+    logInfo("Upstairs Thermostat", "Set point updated")
+
+    var Number upstairsHeatSetpoint = ThermostatUpstairsSetpoint.state as DecimalType
+    var Number upstairsHeatSetpointActual = ThermostatUpstairsHeatCurrentSetpoint.state as DecimalType
+
+    if (upstairsHeatSetpointActual != upstairsHeatSetpoint) {
+      logInfo("Thermostat", "Adjusting upstairs thermostat since it is off")
+      sendCommand("ThermostatUpstairsHeatCurrentSetpoint", upstairsHeatSetpoint.toString())
+    }
+
+end
+
+rule ThermostatOfficeSetpointUpdate
+when
+    Item ThermostatOfficeSetpoint received update
+then
+    logInfo("Office Thermostat", "Set point updated")
+
+    var Number officeHeatSetpoint = ThermostatOfficeSetpoint.state as DecimalType
+    var Number officeHeatSetpointActual = ThermostatOfficeHeatCurrentSetpoint.state as DecimalType
+
+    if (officeHeatSetpointActual != officeHeatSetpoint ) {
+      logInfo("Thermostat", "Adjusting office thermostat since it is off")
+      sendCommand("ThermostatOfficeHeatCurrentSetpoint", officeHeatSetpoint.toString())
+    }
 end
 
