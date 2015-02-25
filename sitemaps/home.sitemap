@@ -26,8 +26,6 @@ sitemap home label="Main Menu" {
               Setpoint item=ThermostatOfficeHeatSetpointWhenOff minValue=52 maxValue=60
             }
             Text     item=ThermostatOfficeHumidityCurrentLevel
-            Setpoint item=ThermostatOfficeHeatSetpointWhenOn minValue=60 maxValue=68
-            Setpoint item=ThermostatOfficeHeatSetpointWhenOff minValue=52 maxValue=60
             Setpoint item=ThermostatOfficeHeatCurrentSetpoint minValue=40 maxValue=80
             Setpoint item=ThermostatOfficeCoolCurrentSetpoint minValue=40 maxValue=80
             Switch   item=ThermostatOfficeFanMode mappings=[ContinuousOn="On", Auto="Auto"]
