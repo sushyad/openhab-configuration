@@ -295,35 +295,25 @@ then
 
 end
 
-rule "Waking up rule for weekdays"
+rule "Waking up rule"
 when
-    Time cron "0 6 6 ? * MON-FRI"
+    Time cron "0 0/5 6-21 ? * MON-THU" or
+    Time cron "0 0/5 6-22 ? * FRI" or
+    Time cron "0 0/5 7-22 ? * SAT" or
+    Time cron "0 0/5 7-21 ? * SUN" 
 then
-    logInfo("Wakeup", "Waking up on weekdays...")    
+    logInfo("Wakeup", "Someone is awake...")
     postUpdate("SomeoneIsAwake", "ON")
 end
 
-rule "Waking up rule for weekends"
+rule "Going to bed rule"
 when
-    Time cron "0 0 7 ? * SAT-SUN"
+    Time cron "0 0/5 22-23,0-5 ? * MON-THU" or
+    Time cron "0 0/5 23,0-5 ? * FRI" or
+    Time cron "0 0/5 23,0-6 ? * SAT" or
+    Time cron "0 0/5 22-23,0-6 ? * SUN" 
 then
-    logInfo("Wakeup", "Waking up on weekends...")
-    postUpdate("SomeoneIsAwake", "ON")
-end
-
-rule "Going to bed rule for weekdays"
-when
-    Time cron "0 0 22 ? * SUN-THU"
-then
-    logInfo("Bedtime", "Going to bed on weekdays...")
-    postUpdate("SomeoneIsAwake", "OFF")
-end
-
-rule "Going to bed rule for weekends"
-when
-    Time cron "0 0 23 ? * FRI-SAT"
-then
-    logInfo("Bedtime", "Going to bed on weekend...")
+    logInfo("Bedtime", "Everybody is asleep...")
     postUpdate("SomeoneIsAwake", "OFF")
 end
 
