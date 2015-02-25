@@ -336,11 +336,11 @@ then
     logInfo("Presence", "ThermostatUpstairsHeatSetpointWhenOn " + ThermostatUpstairsHeatSetpointWhenOn.state.toString())
 
     if (SomeoneIsAwake.state == ON) {
-      postUpdate("ThermostatUpstairsSetpoint", "64")
-      postUpdate("ThermostatOfficeSetpoint", "64")
+      postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOn.state.toString())
+      postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOn.state.toString())
     } else {
-      postUpdate("ThermostatUpstairsSetpoint", "55")
-      postUpdate("ThermostatOfficeSetpoint", "55")
+      postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOff.state.toString())
+      postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOff.state.toString())
     }
 end
 
@@ -349,8 +349,8 @@ when
     Item Presence received command OFF
 then
     logInfo("Presence", "Everybody left home")
-    postUpdate("ThermostatUpstairsSetpoint", "55")
-    postUpdate("ThermostatOfficeSetpoint", "55")
+    postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOff.state.toString())
+    postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOff.state.toString())
 end
 
 rule ThermostatUpstairsSetpointUpdate
