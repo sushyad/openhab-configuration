@@ -27,10 +27,13 @@ when
     Item PresenceBlanca_Home changed from OFF to ON
 then
     logInfo("Presence", "Blanca about to reach home")
-    squeezeboxSpeak("Office", "Blanca is about to reach home. Blanca is about to reach home.")
-    squeezeboxSpeak("LivingRoom", "Blanca is about to reach home. Blanca is about to reach home.")
 
-    if (Presence.state != ON) sendCommand(Presence, ON)
+    if (phoneBlanca.state != ON)
+    {
+      sendCommand(Presence, ON)
+      squeezeboxSpeak("Office", "Blanca is about to reach home. Blanca is about to reach home.")
+      squeezeboxSpeak("LivingRoom", "Blanca is about to reach home. Blanca is about to reach home.")
+    }
 end
 
 rule BlancaLeftHome
@@ -57,10 +60,14 @@ when
     Item PresenceSusheel_Home changed from OFF to ON
 then
     logInfo("Presence", "Susheel about to reach home")
-    squeezeboxSpeak("Office", "Susheel is about to reach home. Susheel is about to reach home.")
-    squeezeboxSpeak("LivingRoom", "Susheel is about to reach home. Susheel is about to reach home.")
 
-    if (Presence.state != ON) sendCommand(Presence, ON)
+    if (phoneSusheel.state != ON)
+    {
+      sendCommand(Presence, ON)
+      squeezeboxSpeak("Office", "Susheel is about to reach home. Susheel is about to reach home.")
+      squeezeboxSpeak("LivingRoom", "Susheel is about to reach home. Susheel is about to reach home.")
+    }
+
 end
 
 rule SusheelLeftHome
@@ -293,6 +300,12 @@ then
       }
     }
 
+    if (ThermostatUpstairsModeState.state.toString() == 'Idle') {
+      postUpdate("ThermostatUpstairsState", "0")
+    } else {
+      postUpdate("ThermostatUpstairsState", "1")
+    }
+
 end
 
 rule "Waking up rule"
@@ -371,6 +384,19 @@ then
     if (officeHeatSetpointActual != officeHeatSetpoint ) {
       logInfo("Thermostat", "Adjusting office thermostat since it is off")
       sendCommand("ThermostatOfficeHeatCurrentSetpoint", officeHeatSetpoint.toString())
+    }
+end
+
+rule ThermostatUpstairsModeStateChange
+when 
+    Item ThermostatUpstairsModeState received update
+then
+    if (ThermostatUpstairsModeState.state.toString() == 'Idle') {
+      logInfo("Thermostat", "Upstairs turned off")
+      postUpdate("ThermostatUpstairsState", "0")
+    } else {
+      logInfo("Thermostat", "Upstairs turned on")
+      postUpdate("ThermostatUpstairsState", "1")
     }
 end
 
