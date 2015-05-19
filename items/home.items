@@ -49,6 +49,7 @@ Number   ThermostatUpstairsBatteryLevel "Battery Level [%d] %" (GThermostatUpsta
 Number   ThermostatUpstairsSetpoint
 Number   ThermostatUpstairsHeatSetpointWhenOn  "Heat Setpoint When On [%.1f F]" <temperature>
 Number   ThermostatUpstairsHeatSetpointWhenOff  "Heat Setpoint When Off [%.1f F]" <temperature>
+Number   ThermostatUpstairsState "State [%.1f]"
 
 Number   ThermostatOfficeId "ID [%d]" {mios="unit:house,device:13/id"}
 String   ThermostatOfficeDeviceStatus "Device Status [%s]" (GThermostatOffice) {mios="unit:house,device:13/status"}
@@ -66,6 +67,7 @@ DateTime ThermostatOfficeLastUpdate "Last Update [%1$ta, %1$tm/%1$te %1$tR]" <ca
 Number   ThermostatOfficeSetpoint
 Number   ThermostatOfficeHeatSetpointWhenOn  "Heat Setpoint When On [%.1f F]" <temperature>
 Number   ThermostatOfficeHeatSetpointWhenOff  "Heat Setpoint When Off [%.1f F]" <temperature>
+Number   ThermostatOfficeState
 
 Dimmer MusicVolumeLivingRoom      "Volume LR [%.1f %%]" { squeeze="LivingRoom:volume" }
 String MusicTitleLivingRoom       "Title LR [%s]"     { squeeze="LivingRoom:title" }

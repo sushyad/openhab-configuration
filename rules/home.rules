@@ -12,14 +12,12 @@ rule sendSwitchCommandOn
 when 
     Item Switch2 received command ON
 then
-    squeezeboxSpeak("Office", "Switch turned on. Switch turned on. Switch turned on.")
 end
 
 rule sendSwitchCommandOff
 when 
     Item Switch2 received command OFF
 then
-    squeezeboxSpeak("Office", "Switch turned off. Switch turned off. Switch turned off.")
 end
 
 rule BlancaReachedHome
@@ -194,12 +192,14 @@ then
     squeezeboxSpeak("LivingRoom", "Left garage door opened. Left garage door opened.")
     squeezeboxSpeak("Office", "Left garage door opened. Left garage door opened.")
 
-    createTimer(now.plusMinutes(3)) [|
+    createTimer(now.plusMinutes(5)) [|
         if (garageDoorLeft.state == ON) {
           logInfo("Garage Door - Blanca", "Left Open")
           notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Left open', 1, '', false)
           squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
           squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
+          sendMail('abd@def.com', 'Blanca left the garage door open', '')
+          sendMail('abc@gmail.com', 'Blanca left the garage door open', '')
           //sendCommand(garageDoorLeft, OFF)
         }
     ]
@@ -223,12 +223,14 @@ then
     squeezeboxSpeak("LivingRoom", "Right garage door opened. Right garage door opened.")
     squeezeboxSpeak("Office", "Right garage door opened. Right garage door opened.")
 
-    createTimer(now.plusMinutes(3)) [|
+    createTimer(now.plusMinutes(5)) [|
         if (garageDoorLeft.state == ON) {
           logInfo("Garage Door - Susheel", "Left Open")
           notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Left open', 1, '', false)
           squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
           squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
+          sendMail('abd@def.com', 'Susheel left the garage door open', '')
+          sendMail('abc@gmail.com', 'Susheel left the garage door open', '')
           //sendCommand(garageDoorRight, OFF)
         }
     ]
@@ -279,6 +281,14 @@ rule "Periodically check presence"
 when
     Time cron "0 * * * * ?"
 then
+    logInfo("Thermostat", "Checking state...")
+
+    if (ThermostatUpstairsModeState.state.toString() == 'Idle') {
+      postUpdate("ThermostatUpstairsState", "0")
+    } else {
+      postUpdate("ThermostatUpstairsState", "1")
+    }
+
     logInfo("Presence", "Checking presence...")
 
     if (Presence.state == ON) {
@@ -298,12 +308,6 @@ then
       } else if (Presence.state == Undefined || Presence.state == Uninitialized) {
         sendCommand(Presence, OFF)
       }
-    }
-
-    if (ThermostatUpstairsModeState.state.toString() == 'Idle') {
-      postUpdate("ThermostatUpstairsState", "0")
-    } else {
-      postUpdate("ThermostatUpstairsState", "1")
     }
 
 end

@@ -12,12 +12,17 @@ sitemap home label="Main Menu" {
             Switch   item=ThermostatUpstairsFanMode mappings=[ContinuousOn="On", Auto="Auto"]
             Text     item=ThermostatUpstairsFanStatus
             Switch   item=ThermostatUpstairsModeStatus mappings=[HeatOn="Heat", CoolOn="Cool", AutoChangeOver="Auto", Off="Off"]
-            Text     item=ThermostatUpstairsModeState
-
             Switch   item=Temperature_Chart_Period label="Chart Period" mappings=[0="Hour", 1="Day", 2="Week"]
             Chart    item=ThermostatUpstairsCurrentTemperature period=h refresh=300 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
             Chart    item=ThermostatUpstairsCurrentTemperature period=D refresh=1800 visibility=[Temperature_Chart_Period==1]
             Chart    item=ThermostatUpstairsCurrentTemperature period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
+
+            Text     item=ThermostatUpstairsModeState {
+              Text    item=ThermostatUpstairsState 
+              Chart    item=ThermostatUpstairsState period=h refresh=300 visibility=[Temperature_Chart_Period==0, Temperature_Chart_Period=="Uninitialized"]
+              Chart    item=ThermostatUpstairsState period=D refresh=1800 visibility=[Temperature_Chart_Period==1]
+              Chart    item=ThermostatUpstairsState period=W refresh=3600 visibility=[Temperature_Chart_Period==2]
+            }
         }
 
         Text	item=ThermostatOfficeCurrentTemperature {
