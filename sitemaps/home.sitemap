@@ -7,6 +7,10 @@ sitemap home label="Main Menu" {
               Setpoint item=ThermostatUpstairsHeatSetpointWhenOn minValue=60 maxValue=68
               Setpoint item=ThermostatUpstairsHeatSetpointWhenOff minValue=52 maxValue=60
             }
+            Text label="Cool Setpoint Settings" icon="temperature" {
+              Setpoint item=ThermostatUpstairsCoolSetpointWhenOn minValue=68 maxValue=76
+              Setpoint item=ThermostatUpstairsCoolSetpointWhenOff minValue=76 maxValue=84
+            }
             Setpoint item=ThermostatUpstairsHeatCurrentSetpoint minValue=40 maxValue=80 {
             Setpoint item=ThermostatUpstairsCoolCurrentSetpoint minValue=40 maxValue=80
             Switch   item=ThermostatUpstairsFanMode mappings=[ContinuousOn="On", Auto="Auto"]

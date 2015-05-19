@@ -7,6 +7,8 @@ then
   executeCommandLine("touch /etc/openhab/configurations/persistence/mongodb.persist")
   postUpdate("ThermostatUpstairsHeatSetpointWhenOn", "64")
   postUpdate("ThermostatUpstairsHeatSetpointWhenOff", "56")
+  postUpdate("ThermostatUpstairsCoolSetpointWhenOn", "71")
+  postUpdate("ThermostatUpstairsCoolSetpointWhenOff", "80")
   postUpdate("ThermostatOfficeHeatSetpointWhenOn", "64")
   postUpdate("ThermostatOfficeHeatSetpointWhenOff", "56")
 end

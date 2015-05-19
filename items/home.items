@@ -49,6 +49,8 @@ Number   ThermostatUpstairsBatteryLevel "Battery Level [%d] %" (GThermostatUpsta
 Number   ThermostatUpstairsSetpoint
 Number   ThermostatUpstairsHeatSetpointWhenOn  "Heat Setpoint When On [%.1f F]" <temperature>
 Number   ThermostatUpstairsHeatSetpointWhenOff  "Heat Setpoint When Off [%.1f F]" <temperature>
+Number   ThermostatUpstairsCoolSetpointWhenOn  "Cool Setpoint When On [%.1f F]" <temperature>
+Number   ThermostatUpstairsCoolSetpointWhenOff  "Coolt Setpoint When Off [%.1f F]" <temperature>
 Number   ThermostatUpstairsState "State [%.1f]"
 
 Number   ThermostatOfficeId "ID [%d]" {mios="unit:house,device:13/id"}
