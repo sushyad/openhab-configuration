@@ -40,7 +40,7 @@ when
 then
     logInfo("Presence", "Blanca left home")
     if (garageDoorLeft.state == ON) {
-        notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Left open', 1, '', false)
+        notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Left open', 1, '', false)
         sendCommand(garageDoorLeft, OFF)
     }
 
@@ -74,7 +74,7 @@ when
 then
     logInfo("Presence", "Susheel left home")
     if (garageDoorRight.state == ON) {
-        notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Left open', 1, '', false)
+        notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Left open', 1, '', false)
         sendCommand(garageDoorRight, OFF)
     }
 
@@ -180,7 +180,7 @@ then
     logInfo("Dryer", "Status update " + dryer.state.toString)
     squeezeboxSpeak("Office", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
     squeezeboxSpeak("LivingRoom", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Dryer', 'Dryer turned OFF', 1, '', false)
+    notifyMyAndroid('blahblah', 'Dryer', 'Dryer turned OFF', 1, '', false)
 end
 
 rule "When left garage door opens"
@@ -188,14 +188,14 @@ when
     Item garageDoorLeft changed from OFF to ON
 then
     logInfo("GarageDoorLeft", "Opened")
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Opened', 1, '', false)
+    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Opened', 1, '', false)
     squeezeboxSpeak("LivingRoom", "Left garage door opened. Left garage door opened.")
     squeezeboxSpeak("Office", "Left garage door opened. Left garage door opened.")
 
     createTimer(now.plusMinutes(5)) [|
         if (garageDoorLeft.state == ON) {
             logInfo("Garage Door - Blanca", "Left Open")
-            notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Left open', 1, '', false)
+            notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Left open', 1, '', false)
             squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
             squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
             sendMail('abc@abc.com', 'Blanca left the garage door open', '')
@@ -211,7 +211,7 @@ when
 then
     logInfo("GarageDoorLeft", "Closed")
     squeezeboxSpeak('LivingRoom', 'Left garage door closed')
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Closed', 1, '', false)
+    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Closed', 1, '', false)
 end
 
 rule "When right garage door opens"
@@ -219,14 +219,14 @@ when
     Item garageDoorRight changed from OFF to ON
 then
     logInfo("GarageDoorRight", "Opened")
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Opened', 1, '', false)
+    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Opened', 1, '', false)
     squeezeboxSpeak("LivingRoom", "Right garage door opened. Right garage door opened.")
     squeezeboxSpeak("Office", "Right garage door opened. Right garage door opened.")
 
     createTimer(now.plusMinutes(5)) [|
         if (garageDoorLeft.state == ON) {
             logInfo("Garage Door - Susheel", "Left Open")
-            notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Left open', 1, '', false)
+            notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Left open', 1, '', false)
             squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
             squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
             sendMail('abc@abc.com', 'Susheel left the garage door open', '')
@@ -242,7 +242,7 @@ when
 then
     logInfo("GarageDoorRight", "Status update " + garageDoorRight.state.toString)
     squeezeboxSpeak("LivingRoom", "Right garage door closed. Right garage door closed.")
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Closed', 1, '', false)
+    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Closed', 1, '', false)
 end
 
 rule "When left garage door sensor is armed"
@@ -250,7 +250,7 @@ when
     Item garageDoorLeftArmed changed from 0 to 1
 then
     logInfo("GarageDoorLeftArmed", "Status update " + garageDoorLeftArmed.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Armed', 1, '', false);
+    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Armed', 1, '', false);
 end
 
 rule "When left garage door sensor is disabled"
@@ -258,7 +258,7 @@ when
     Item garageDoorLeftArmed changed from 1 to 0
 then
     logInfo("GarageDoorLeftArmed", "Status update " + garageDoorLeftArmed.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Disabled', 1, '', false);
+    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Disabled', 1, '', false);
 end
 
 rule "When right garage door sensor is armed"
@@ -266,7 +266,7 @@ when
     Item garageDoorRightArmed changed from 0 to 1
 then
     logInfo("GarageDoorRightArmed", "Status update " + garageDoorRightArmed.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Armed', 1, '', false);
+    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Armed', 1, '', false);
 end
 
 rule "When right garage door sensor is disabled"
@@ -274,7 +274,7 @@ when
     Item garageDoorRightArmed changed from 1 to 0
 then
     logInfo("GarageDoorRightArmed", "Status update " + garageDoorRightArmed.state.toString)
-    notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Disabled', 1, '', false);
+    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Disabled', 1, '', false);
 end
 
 rule "Periodically check presence"
