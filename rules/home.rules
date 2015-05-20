@@ -198,8 +198,8 @@ then
             notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Blanca', 'Left open', 1, '', false)
             squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
             squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
-            sendMail('abd@def.com', 'Blanca left the garage door open', '')
-            sendMail('abc@gmail.com', 'Blanca left the garage door open', '')
+            sendMail('abc@abc.com', 'Blanca left the garage door open', '')
+            sendMail('def@def.org', 'Blanca left the garage door open', '')
             //sendCommand(garageDoorLeft, OFF)
         }
     ]
@@ -229,8 +229,8 @@ then
             notifyMyAndroid('e5c06428e3792bfed6147a7928b9cdbc9762228cb6e64b93', 'Garage Door - Susheel', 'Left open', 1, '', false)
             squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
             squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
-            sendMail('abd@def.com', 'Susheel left the garage door open', '')
-            sendMail('abc@gmail.com', 'Susheel left the garage door open', '')
+            sendMail('abc@abc.com', 'Susheel left the garage door open', '')
+            sendMail('def@def.org', 'Susheel left the garage door open', '')
             //sendCommand(garageDoorRight, OFF)
         }
     ]
@@ -339,28 +339,32 @@ when
     Item Presence received command ON
 then
     var Number hourOfDay = now.getHourOfDay()
+    var String upstairsModeStatus = ThermostatUpstairsModeStatus.state.toString
+
     logInfo("Presence", "Someone is home")
     logInfo("Presence", "ThermostatUpstairsHeatSetpointWhenOn " + ThermostatUpstairsHeatSetpointWhenOn.state.toString())
     logInfo("Presence", "ThermostatUpstairsCoolSetpointWhenOn " + ThermostatUpstairsCoolSetpointWhenOn.state.toString())
 
     if (SomeoneIsAwake.state == ON) {
-        if (ThermostatUpstairsModeStatus.state.toString() == "HeatOn")
+        if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
             postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOn.state.toString())
-            postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOn.state.toString())
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "CoolOn") {
+        } else if (upstairsModeStatus.equalsIgnoreCase("CoolOn")) {
             postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsCoolSetpointWhenOn.state.toString())
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "AutoChangeOver") {
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "Off") {
+        } else if (upstairsModeStatus.equalsIgnoreCase("AutoChangeOver")) {
+        } else if (upstairsModeStatus.equalsIgnoreCase"Off")) {
         }
+
+        postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOn.state.toString())
     } else {
-        if (ThermostatUpstairsModeStatus.state.toString() == "HeatOn")
+        if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
             postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOff.state.toString())
-            postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOff.state.toString())
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "CoolOn") {
+        } else if (upstairsModeStatus.equalsIgnoreCase("CoolOn")) {
             postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsCoolSetpointWhenOff.state.toString())
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "AutoChangeOver") {
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "Off") {
+        } else if (upstairsModeStatus.equalsIgnoreCase("AutoChangeOver")) {
+        } else if (upstairsModeStatus.equalsIgnoreCase("Off")) {
         }
+
+        postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOff.state.toString())
     }
 end
 
@@ -384,24 +388,28 @@ rule ThermostatUpstairsSetpointUpdate
 when
     Item ThermostatUpstairsSetpoint received update
 then
-    logInfo("Upstairs Thermostat", "Set point updated")
-
     var Number upstairsSetpoint = ThermostatUpstairsSetpoint.state as DecimalType
+    var Number upstairsHeatSetpointActual = ThermostatUpstairsHeatCurrentSetpoint.state as DecimalType
+    var Number upstairsCoolSetpointActual = ThermostatUpstairsCoolCurrentSetpoint.state as DecimalType
+    var String upstairsModeStatus = ThermostatUpstairsModeStatus.state.toString
     
-    if (ThermostatUpstairsModeStatus.state.toString() == "HeatOn")
-        var Number upstairsHeatSetpointActual = ThermostatUpstairsHeatCurrentSetpoint.state as DecimalType
+    logInfo("Upstairs Thermostat", "Set point updated")
+    logInfo("Upstairs Thermostat", "Mode: " + upstairsModeStatus)
+
+    if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
+	logInfo("Upstairs Thermostat", "Heat is on")
         if (upstairsHeatSetpointActual != upstairsSetpoint) {
-          logInfo("Thermostat", "Adjusting upstairs thermostat since it is off")
+          logInfo("Thermostat", "Adjusting upstairs heat since it is off")
           sendCommand("ThermostatUpstairsHeatCurrentSetpoint", upstairsSetpoint.toString())
         }
-    } else if (ThermostatUpstairsModeStatus.state.toString() == "CoolOn") {
-        var Number upstairsCoolSetpointActual = ThermostatUpstairsCoolCurrentSetpoint.state as DecimalType
+    } else if (upstairsModeStatus.equalsIgnoreCase("CoolOn")) {
+	logInfo("Upstairs Thermostat", "Cooling is on")
         if (upstairsCoolSetpointActual != upstairsSetpoint) {
-          logInfo("Thermostat", "Adjusting upstairs thermostat since it is off")
+          logInfo("Thermostat", "Adjusting upstairs cooling since it is off")
           sendCommand("ThermostatUpstairsCoolCurrentSetpoint", upstairsSetpoint.toString())
         }
-    } else if (ThermostatUpstairsModeStatus.state.toString() == "AutoChangeOver") {
-    } else if (ThermostatUpstairsModeStatus.state.toString() == "Off") {
+    } else if (upstairsModeStatus.equalsIgnoreCase("AutoChangeOver")) {
+    } else if (upstairsModeStatus.equalsIgnoreCase("Off")) {
     }
 
 end
@@ -432,4 +440,11 @@ then
       logInfo("Thermostat", "Upstairs turned on")
       postUpdate("ThermostatUpstairsState", "1")
     }
+end
+
+rule ThermostatUpstairsModeStatusChange
+when 
+    Item ThermostatUpstairsModeStatus received update
+then
+    logInfo("Upstairs Thermostat", "Mode status changed: " + ThermostatUpstairsModeStatus.state.toString())
 end
