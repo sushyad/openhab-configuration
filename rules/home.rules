@@ -40,7 +40,7 @@ when
 then
     logInfo("Presence", "Blanca left home")
     if (garageDoorLeft.state == ON) {
-        notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Left open', 1, '', false)
+        notifyMyAndroid('cd2b8f50bfc760616f9d032e706ed89b9f4b60b436d96d45', 'Garage Door - Blanca', 'Left open', 1, '', false)
         sendCommand(garageDoorLeft, OFF)
     }
 
@@ -340,10 +340,30 @@ when
 then
     var Number hourOfDay = now.getHourOfDay()
     var String upstairsModeStatus = ThermostatUpstairsModeStatus.state.toString
+    var String officeModeStatus = ThermostatofficeModeStatus.state.toString
 
     logInfo("Presence", "Someone is home")
     logInfo("Presence", "ThermostatUpstairsHeatSetpointWhenOn " + ThermostatUpstairsHeatSetpointWhenOn.state.toString())
     logInfo("Presence", "ThermostatUpstairsCoolSetpointWhenOn " + ThermostatUpstairsCoolSetpointWhenOn.state.toString())
+
+    var Number upstairsCurrentTemperature = ThermostatUpstairsCurrentTemperature.state as DecimalType
+    var Number officeCurrentTemperature = ThermostatOfficeCurrentTemperature.state as DecimalType
+    var Number upstairsHeatSetpoint = ThermostatUpstairsHeatCurrentSetpoint.state as DecimalType
+    var Number upstairsCoolSetpoint = ThermostatUpstairsCoolCurrentSetpoint.state as DecimalType
+    var Number officeHeatSetpoint = ThermostatOfficeHeatCurrentSetpoint.state as DecimalType
+
+    if (upstairsCurrentTemperature < upstairsHeatSetpoint && upstairsModeStatus != "HeatOn") {
+        logInfo("thermostat.upstairs", "Turning heat on upstairs since temperature " + upstairsCurrentTemperature + " is below limit " + upstairsHeatSetpoint)
+        sendCommand("ThermostatUpstairsModeStatus", "HeatOn")
+    } else if (upstairsCurrentTemperature > upstairsCoolSetpoint && upstairsModeStatus != "CoolOn") {
+        logInfo("thermostat.upstairs", "Turning cooling on upstairs since temperature " + upstairsCurrentTemperature + " is above limit " + upstairsCoolSetpoint)
+        sendCommand("ThermostatUpstairsModeStatus", "CoolOn")
+    }
+
+    if (officeCurrentTemperature < officeHeatSetpoint && officeModeStatus != "HeatOn") {
+        logInfo("thermostat.office", "Turning heat on office since temperature " + officeCurrentTemperature + " is below limit " + officeHeatSetpoint)
+        sendCommand("ThermostatOfficeModeStatus", "HeatOn")
+    }
 
     if (SomeoneIsAwake.state == ON) {
         if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
