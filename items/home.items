@@ -29,6 +29,7 @@ String dryer "Dryer [%s]" { http="<[http://192.168.0.108:8080/api/dryer/state:60
 
 Switch  Presence
 Switch  SomeoneIsAwake
+Switch  ManualOverride
 Switch  PresenceSusheel_Home   "Susheel @ Home" (gPresenceHome) { mqttitude="securebroker:location/susheel:home", autoupdate="false" }
 Switch  PresenceSusheel_Work   "Susheel @ Work" (gPresenceWork) { mqttitude="securebroker:location/susheel:work", autoupdate="false" }
 Switch  PresenceBlanca_Home   "Blanca @ Home" (gPresenceHome) { mqttitude="securebroker:location/blanca:home", autoupdate="false" }

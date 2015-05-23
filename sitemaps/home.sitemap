@@ -1,6 +1,7 @@
 sitemap home label="Main Menu" {
 
     Frame {
+        Switch item=ManualOverride label="Manual Override?" mappings=[ON="Yes", OFF="No"]
 
         Text	item=ThermostatUpstairsCurrentTemperature {
             Text label="Heat Setpoint Settings" icon="temperature" {
