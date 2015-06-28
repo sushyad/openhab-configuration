@@ -85,6 +85,7 @@ sitemap home label="Main Menu" {
         Switch item=PresenceBlanca_Work label="Is Blanca at work?" mappings=[ON="Yes", OFF="No"]
         Switch item=PresenceBlanca_Home label="Is Blanca home?" mappings=[ON="Yes", OFF="No"]
 
+        Switch item=phoneCarmen label="Carmen Home" mappings=[ON="Yes", OFF="No"]
         Switch item=phoneBlanca label="Blanca Home" mappings=[ON="Yes", OFF="No"]
         Switch item=phoneSusheel label="Susheel Home" mappings=[ON="Yes", OFF="No"]
     }

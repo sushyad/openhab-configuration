@@ -3,8 +3,8 @@ Group gPresenceWork
 Group gMobiles
 
 Number ElectricityUsage "Electricity Usage [%.1f W]" <energy> (zPower) { mqtt="<[localbroker:wsn/electric_meter/power:state:default]"}
-String sunriseTime "Sunrise [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:1800000:XSLT(sunrise.xsl)]" }
-String sunsetTime "Sunset [%s]" <clock> { http="<[http://192.168.0.2/weather/weather.xml:1800000:XSLT(sunset.xsl)]" }
+String sunriseTime "Sunrise [%s]" <clock> { http="<[http://localhost/data/weather.xml:1800000:XSLT(sunrise.xsl)]" }
+String sunsetTime "Sunset [%s]" <clock> { http="<[http://localhost/data/weather.xml:1800000:XSLT(sunset.xsl)]" }
 
 Group Temperature_Chart 
 Number Temperature_Chart_Period "Temperature Chart Period"
@@ -25,7 +25,7 @@ Switch garageDoorRight "Garage Door Right [%s]" <switch> (GContact,GGarage,GPers
 Switch onkyoPower  {onkyo="ON:hometheater:POWER_ON, OFF:hometheater:POWER_OFF"}
 Dimmer onkyoVolume {onkyo="INCREASE:hometheater:VOLUME_UP, DECREASE:hometheater:VOLUME_DOWN"}
 
-String dryer "Dryer [%s]" { http="<[http://192.168.0.108:8080/api/dryer/state:600000:REGEX((.*))]" }
+String dryer "Dryer [%s]" { http="<[http://192.168.0.108:8080/api/dryer/state:60000:REGEX((.*))]" }
 
 Switch  Presence
 Switch  SomeoneIsAwake
@@ -34,6 +34,7 @@ Switch  PresenceSusheel_Home   "Susheel @ Home" (gPresenceHome) { mqttitude="sec
 Switch  PresenceSusheel_Work   "Susheel @ Work" (gPresenceWork) { mqttitude="securebroker:location/susheel:work", autoupdate="false" }
 Switch  PresenceBlanca_Home   "Blanca @ Home" (gPresenceHome) { mqttitude="securebroker:location/blanca:home", autoupdate="false" }
 Switch  PresenceBlanca_Work   "Blanca @ Work" (gPresenceWork) { mqttitude="securebroker:location/blanca:work", autoupdate="false" }
+Switch  phoneCarmen (gMobiles) {nh="192.168.0.122:5061"}
 Switch  phoneBlanca (gMobiles) {nh="192.168.0.6"}
 Switch  phoneSusheel (gMobiles) {nh="192.168.0.7"}
 

@@ -200,7 +200,9 @@ then
             squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
             sendMail('abc@abc.com', 'Blanca left the garage door open', '')
             sendMail('def@def.org', 'Blanca left the garage door open', '')
-            //sendCommand(garageDoorLeft, OFF)
+            sendCommand(garageDoorLeft, OFF)
+            sendMail('abc@abc.org', 'Closed the right garage door', '')
+            sendMail('def@def.org', 'Closed the right garage door', '')
         }
     ]
 end
@@ -231,7 +233,9 @@ then
             squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
             sendMail('abc@abc.com', 'Susheel left the garage door open', '')
             sendMail('def@def.org', 'Susheel left the garage door open', '')
-            //sendCommand(garageDoorRight, OFF)
+            sendCommand(garageDoorRight, OFF)
+            sendMail('abc@abc.org', 'Closed the left garage door', '')
+            sendMail('def@def.org', 'Closed the left garage door', '')
         }
     ]
 end
@@ -292,6 +296,7 @@ then
     logInfo("Presence", "Checking presence...")
 
     if (Presence.state == ON) {
+        logInfo("PresenceCheck", "Presence was ON")
         if (gMobiles.members.filter(s | s.state == ON).size == 0) {
             logInfo("PresenceCheck", "No phone within reach, checking for flapping")
             if (gMobiles.members.filter(s | s.changedSince(now.minusMinutes(5))).size == 0) {
@@ -299,13 +304,17 @@ then
                 sendCommand(Presence, OFF)
             }
         } else {
+            logInfo("PresenceCheck", "Some phone is within reach, setting presence to ON")
             sendCommand(Presence, ON)
         }
     } else {
+        logInfo("PresenceCheck", "Presence was not ON")
         //For initialization. If Presence is undefined or off, although it should be on.
         if (gMobiles.members.filter(s | s.state == ON).size > 0) {
+            logInfo("PresenceCheck", "Setting presence to ON")
             sendCommand(Presence, ON)
-        } else if (Presence.state == Undefined || Presence.state == Uninitialized) {
+        } else {
+            logInfo("PresenceCheck", "Setting presence to OFF")
             sendCommand(Presence, OFF)
         }
     }
@@ -346,12 +355,14 @@ rule SomeoneReachedHome
 when
     Item Presence received command ON
 then
+    logInfo("presence.home", "Someone is home")
+
     if (ManualOverride.state != ON) {
+        logInfo("presence.home", "Running under auto control")
         var Number hourOfDay = now.getHourOfDay()
         var String upstairsModeStatus = ThermostatUpstairsModeStatus.state.toString
         var String officeModeStatus = ThermostatOfficeModeStatus.state.toString
 
-        logInfo("presence.home", "Someone is home")
         logInfo("presence.home", "ThermostatUpstairsHeatSetpointWhenOn " + ThermostatUpstairsHeatSetpointWhenOn.state.toString())
         logInfo("presence.home", "ThermostatUpstairsCoolSetpointWhenOn " + ThermostatUpstairsCoolSetpointWhenOn.state.toString())
 
@@ -375,6 +386,7 @@ then
         }
 
         if (SomeoneIsAwake.state == ON) {
+            logInfo("presence", "Someone is awake")
             if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
                 postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOn.state.toString())
             } else if (upstairsModeStatus.equalsIgnoreCase("CoolOn")) {
@@ -385,12 +397,17 @@ then
 
             postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOn.state.toString())
         } else {
+            logInfo("presence", "No one is awake")
             if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
+                logInfo("presence", "Upstairs was heating")
                 postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOff.state.toString())
             } else if (upstairsModeStatus.equalsIgnoreCase("CoolOn")) {
+                logInfo("presence", "Upstairs was cooling")
                 postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsCoolSetpointWhenOff.state.toString())
             } else if (upstairsModeStatus.equalsIgnoreCase("AutoChangeOver")) {
+                logInfo("presence", "Upstairs was auto")
             } else if (upstairsModeStatus.equalsIgnoreCase("Off")) {
+                logInfo("presence", "Upstairs was off")
             }
 
             postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOff.state.toString())
@@ -405,15 +422,30 @@ when
     Item Presence received command OFF
 then
     if (ManualOverride.state != ON) {
-        logInfo("Presence", "Everybody left home")
+        logInfo("PresenceOff", "Everybody left home")
 
-        if (ThermostatUpstairsModeStatus.state.toString() == "HeatOn")
+        var Number upstairsSetpoint = ThermostatUpstairsSetpoint.state as DecimalType
+        var Number upstairsHeatSetpointActual = ThermostatUpstairsHeatCurrentSetpoint.state as DecimalType
+        var Number upstairsCoolSetpointActual = ThermostatUpstairsCoolCurrentSetpoint.state as DecimalType
+        var String upstairsModeStatus = ThermostatUpstairsModeStatus.state.toString
+
+        logInfo("PresenceOff", "Checking upstairs...")
+        logInfo("PresenceOff", "upstairsSetpoint: " + upstairsSetpoint)
+        logInfo("PresenceOff", "upstairsHeatSetpointActual: " + upstairsHeatSetpointActual)
+        logInfo("PresenceOff", "upstairsCoolSetpointActual: " + upstairsCoolSetpointActual)
+        logInfo("PresenceOff", "upstairsModeStatus: " + upstairsModeStatus)
+
+        if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
+            logInfo("PresenceOff", "Upstairs was heating")
             postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsHeatSetpointWhenOff.state.toString())
             postUpdate("ThermostatOfficeSetpoint", ThermostatOfficeHeatSetpointWhenOff.state.toString())
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "CoolOn") {
+        } else if (upstairsModeStatus.equalsIgnoreCase("CoolOn")) {
+            logInfo("PresenceOff", "Upstairs was cooling")
             postUpdate("ThermostatUpstairsSetpoint", ThermostatUpstairsCoolSetpointWhenOff.state.toString())
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "AutoChangeOver") {
-        } else if (ThermostatUpstairsModeStatus.state.toString() == "Off") {
+        } else if (upstairsModeStatus.equalsIgnoreCase("AutoChangeOver")) {
+            logInfo("PresenceOff", "Upstairs was in auto mode")
+        } else if (upstairsModeStatus.equalsIgnoreCase("Off")) {
+            logInfo("PresenceOff", "Upstairs was off")
         }
     } else {
         logInfo("presence.left", "Running on manual control")
@@ -424,24 +456,26 @@ rule ThermostatUpstairsSetpointUpdate
 when
     Item ThermostatUpstairsSetpoint received update
 then
+    logInfo("Thermostat", "Upstairs Set point updated")
+
     var Number upstairsSetpoint = ThermostatUpstairsSetpoint.state as DecimalType
     var Number upstairsHeatSetpointActual = ThermostatUpstairsHeatCurrentSetpoint.state as DecimalType
     var Number upstairsCoolSetpointActual = ThermostatUpstairsCoolCurrentSetpoint.state as DecimalType
     var String upstairsModeStatus = ThermostatUpstairsModeStatus.state.toString
     
-    logInfo("Upstairs Thermostat", "Set point updated")
+    logInfo("Upstairs Thermostat", "Received set point update of " + upstairsSetpoint)
     logInfo("Upstairs Thermostat", "Mode: " + upstairsModeStatus)
 
     if (upstairsModeStatus.equalsIgnoreCase("HeatOn")) {
 	logInfo("Upstairs Thermostat", "Heat is on")
         if (upstairsHeatSetpointActual != upstairsSetpoint) {
-          logInfo("Thermostat", "Adjusting upstairs heat since it is off")
+          logInfo("Thermostat", "Adjusting upstairs heat to " + upstairsSetpoint)
           sendCommand("ThermostatUpstairsHeatCurrentSetpoint", upstairsSetpoint.toString())
         }
     } else if (upstairsModeStatus.equalsIgnoreCase("CoolOn")) {
 	logInfo("Upstairs Thermostat", "Cooling is on")
         if (upstairsCoolSetpointActual != upstairsSetpoint) {
-          logInfo("Thermostat", "Adjusting upstairs cooling since it is off")
+          logInfo("Thermostat", "Adjusting upstairs cooling to " + upstairsSetpoint)
           sendCommand("ThermostatUpstairsCoolCurrentSetpoint", upstairsSetpoint.toString())
         }
     } else if (upstairsModeStatus.equalsIgnoreCase("AutoChangeOver")) {
