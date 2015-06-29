@@ -11,6 +11,8 @@ then
   postUpdate("ThermostatUpstairsCoolSetpointWhenOff", "80")
   postUpdate("ThermostatOfficeHeatSetpointWhenOn", "64")
   postUpdate("ThermostatOfficeHeatSetpointWhenOff", "56")
+  postUpdate("ThermostatUpstairsSetpoint", "64")
+  postUpdate("ThermostatOfficeSetpoint", "56")
 
   if (ManualOverride.state == Undefined || ManualOverride.state == Uninitialized) {
       sendCommand(ManualOverride, OFF)
