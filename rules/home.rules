@@ -7,6 +7,9 @@ import java.util.regex.Pattern
 import java.util.HashMap
 
 var Timer tIndoorLights
+var Timer timerGarageDoorLeft
+var Timer timerGarageDoorRight
+var Timer timerLivingRoomLights
 
 rule sendSwitchCommandOn
 when 
@@ -29,7 +32,7 @@ then
     if (phoneBlanca.state != ON)
     {
         sendCommand(Presence, ON)
-        squeezeboxSpeak("Office", "Blanca is about to reach home. Blanca is about to reach home.")
+        //squeezeboxSpeak("Office", "Blanca is about to reach home. Blanca is about to reach home.")
         squeezeboxSpeak("LivingRoom", "Blanca is about to reach home. Blanca is about to reach home.")
     }
 end
@@ -40,7 +43,7 @@ when
 then
     logInfo("Presence", "Blanca left home")
     if (garageDoorLeft.state == ON) {
-        notifyMyAndroid('cd2b8f50bfc760616f9d032e706ed89b9f4b60b436d96d45', 'Garage Door - Blanca', 'Left open', 1, '', false)
+        notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Left open', 1, '', false)
         sendCommand(garageDoorLeft, OFF)
     }
 
@@ -62,7 +65,7 @@ then
     if (phoneSusheel.state != ON)
     {
         sendCommand(Presence, ON)
-        squeezeboxSpeak("Office", "Susheel is about to reach home. Susheel is about to reach home.")
+        //squeezeboxSpeak("Office", "Susheel is about to reach home. Susheel is about to reach home.")
         squeezeboxSpeak("LivingRoom", "Susheel is about to reach home. Susheel is about to reach home.")
     }
 
@@ -74,7 +77,7 @@ when
 then
     logInfo("Presence", "Susheel left home")
     if (garageDoorRight.state == ON) {
-        notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Left open', 1, '', false)
+        notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Left open', 1, '', false)
         sendCommand(garageDoorRight, OFF)
     }
 
@@ -115,6 +118,7 @@ then
     var DateTime sunset = parse(year + "-" + month + "-" + day + "T" + sunsetTime.state)
     var DateTime sunrise = parse(year + "-" + month + "-" + day + "T" + sunriseTime.state)
     if (sunset.isAfterNow()) {
+        postUpdate("isDark", "OFF")
     /*
      * 2nd Foyer Light on Switch4
      */
@@ -135,8 +139,10 @@ then
         sendCommand(Switch2, ON)
         sendCommand(Switch3, ON)
         sendCommand(Switch4, ON)
+        sendCommand(Wifi_Switch_1, ON)
     ]
     } else {
+        postUpdate("isDark", "ON")
         logInfo("Sunset", "Ignoring this sunset update since sun has already set.") 
     }
 end
@@ -148,6 +154,7 @@ then
     sendCommand(Switch2, OFF)
     sendCommand(Switch3, OFF)
     sendCommand(Switch4, OFF)
+    sendCommand(Wifi_Switch_1, OFF)
 end
 
 rule "When thermostat status changes"
@@ -178,9 +185,9 @@ when
     Item dryer changed from ON to OFF
 then
     logInfo("Dryer", "Status update " + dryer.state.toString)
-    squeezeboxSpeak("Office", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
+    //squeezeboxSpeak("Office", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
     squeezeboxSpeak("LivingRoom", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
-    notifyMyAndroid('blahblah', 'Dryer', 'Dryer turned OFF', 1, '', false)
+    notifyMyAndroid('CHANGE_ME', 'Dryer', 'Dryer turned OFF', 1, '', false)
 end
 
 rule "When left garage door opens"
@@ -188,23 +195,30 @@ when
     Item garageDoorLeft changed from OFF to ON
 then
     logInfo("GarageDoorLeft", "Opened")
-    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Opened', 1, '', false)
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Opened', 1, '', false)
     squeezeboxSpeak("LivingRoom", "Left garage door opened. Left garage door opened.")
-    squeezeboxSpeak("Office", "Left garage door opened. Left garage door opened.")
+    //squeezeboxSpeak("Office", "Left garage door opened. Left garage door opened.")
 
-    createTimer(now.plusMinutes(5)) [|
-        if (garageDoorLeft.state == ON) {
+     // Cancel active timer on this garage door to avoid accidental closure
+    if(timerGarageDoorLeft != null) {
+        logInfo("Garage Door - Blanca", "Timer for 'Garage Door - Blanca' canceled")
+        timerGarageDoorLeft.cancel()
+    }
+
+    timerGarageDoorLeft = createTimer(now.plusMinutes(5)) [|
+        if (manualOverrideGarage.state != ON && garageDoorLeft.state == ON) {
             logInfo("Garage Door - Blanca", "Left Open")
-            notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Left open', 1, '', false)
+            notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Left open', 1, '', false)
             squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
-            squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
-            sendMail('abc@abc.com', 'Blanca left the garage door open', '')
-            sendMail('def@def.org', 'Blanca left the garage door open', '')
+            //squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
+            sendMail('abc@def.org', 'Blanca left the garage door open', '')
+            sendMail('def@abc.org', 'Blanca left the garage door open', '')
             sendCommand(garageDoorLeft, OFF)
-            sendMail('abc@abc.org', 'Closed the right garage door', '')
-            sendMail('def@def.org', 'Closed the right garage door', '')
+            sendMail('abc@def.org', 'Closed the right garage door', '')
+            sendMail('def@abc.org', 'Closed the right garage door', '')
         }
     ]
+
 end
 
 rule "When left garage door closes"
@@ -213,7 +227,7 @@ when
 then
     logInfo("GarageDoorLeft", "Closed")
     squeezeboxSpeak('LivingRoom', 'Left garage door closed')
-    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Closed', 1, '', false)
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Closed', 1, '', false)
 end
 
 rule "When right garage door opens"
@@ -221,23 +235,90 @@ when
     Item garageDoorRight changed from OFF to ON
 then
     logInfo("GarageDoorRight", "Opened")
-    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Opened', 1, '', false)
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Opened', 1, '', false)
     squeezeboxSpeak("LivingRoom", "Right garage door opened. Right garage door opened.")
-    squeezeboxSpeak("Office", "Right garage door opened. Right garage door opened.")
+    //squeezeboxSpeak("Office", "Right garage door opened. Right garage door opened.")
 
-    createTimer(now.plusMinutes(5)) [|
-        if (garageDoorLeft.state == ON) {
+    if(timerGarageDoorRight != null) {
+        logInfo("Garage Door - Susheel", "Timer for 'Garage Door - Susheel' canceled")
+        timerGarageDoorRight.cancel()
+    }
+
+    timerGarageDoorRight = createTimer(now.plusMinutes(5)) [|
+        if (manualOverrideGarage.state != ON && garageDoorRight.state == ON) {
             logInfo("Garage Door - Susheel", "Left Open")
-            notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Left open', 1, '', false)
+            notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Left open', 1, '', false)
             squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
-            squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
-            sendMail('abc@abc.com', 'Susheel left the garage door open', '')
-            sendMail('def@def.org', 'Susheel left the garage door open', '')
+            //squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
+            sendMail('abc@def.org', 'Susheel left the garage door open', '')
+            sendMail('def@abc.org', 'Susheel left the garage door open', '')
             sendCommand(garageDoorRight, OFF)
-            sendMail('abc@abc.org', 'Closed the left garage door', '')
-            sendMail('def@def.org', 'Closed the left garage door', '')
+            sendMail('abc@def.org', 'Closed the left garage door', '')
+            sendMail('def@abc.org', 'Closed the left garage door', '')
         }
     ]
+end
+
+
+rule "When manual override for garage door is engaged"
+when
+    Item manualOverrideGarage received command ON
+then
+
+    if(timerGarageDoorLeft != null) {
+        logInfo("Garage Door - Blanca", "Timer for 'Garage Door - Blanca' canceled")
+        timerGarageDoorLeft.cancel()
+    }
+
+    if(timerGarageDoorRight != null) {
+        logInfo("Garage Door - Susheel", "Timer for 'Garage Door - Susheel' canceled")
+        timerGarageDoorRight.cancel()
+    }
+
+end
+rule "When manual override for garage door is canceled"
+when
+    Item manualOverrideGarage received command OFF
+then
+
+    if(timerGarageDoorLeft != null) {
+        logInfo("Garage Door - Blanca", "Timer for 'Garage Door - Blanca' canceled")
+        timerGarageDoorLeft.cancel()
+    }
+
+    timerGarageDoorLeft = createTimer(now.plusMinutes(5)) [|
+        if (manualOverrideGarage.state != ON && garageDoorLeft.state == ON) {
+            logInfo("Garage Door - Blanca", "Left Open")
+            notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Left open', 1, '', false)
+            squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
+            //squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
+            sendMail('abc@def.org', 'Blanca left the garage door open', '')
+            sendMail('def@abc.org', 'Blanca left the garage door open', '')
+            sendCommand(garageDoorLeft, OFF)
+            sendMail('abc@def.org', 'Closed the right garage door', '')
+            sendMail('def@abc.org', 'Closed the right garage door', '')
+        }
+    ]
+
+    if(timerGarageDoorRight != null) {
+        logInfo("Garage Door - Susheel", "Timer for 'Garage Door - Susheel' canceled")
+        timerGarageDoorRight.cancel()
+    }
+
+    timerGarageDoorRight = createTimer(now.plusMinutes(5)) [|
+        if (manualOverrideGarage.state != ON && garageDoorRight.state == ON) {
+            logInfo("Garage Door - Susheel", "Left Open")
+            notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Left open', 1, '', false)
+            squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
+            //squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
+            sendMail('abc@def.org', 'Susheel left the garage door open', '')
+            sendMail('def@abc.org', 'Susheel left the garage door open', '')
+            sendCommand(garageDoorRight, OFF)
+            sendMail('abc@def.org', 'Closed the left garage door', '')
+            sendMail('def@abc.org', 'Closed the left garage door', '')
+        }
+    ]
+
 end
 
 rule "When right garage door closes"
@@ -246,15 +327,15 @@ when
 then
     logInfo("GarageDoorRight", "Status update " + garageDoorRight.state.toString)
     squeezeboxSpeak("LivingRoom", "Right garage door closed. Right garage door closed.")
-    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Closed', 1, '', false)
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Closed', 1, '', false)
 end
 
 rule "When left garage door sensor is armed"
 when
-    Item garageDoorLeftArmed changed from 0 to 1
+   Item garageDoorLeftArmed changed from 0 to 1
 then
     logInfo("GarageDoorLeftArmed", "Status update " + garageDoorLeftArmed.state.toString)
-    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Armed', 1, '', false);
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Armed', 1, '', false);
 end
 
 rule "When left garage door sensor is disabled"
@@ -262,7 +343,7 @@ when
     Item garageDoorLeftArmed changed from 1 to 0
 then
     logInfo("GarageDoorLeftArmed", "Status update " + garageDoorLeftArmed.state.toString)
-    notifyMyAndroid('blahblah', 'Garage Door - Blanca', 'Disabled', 1, '', false);
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Disabled', 1, '', false);
 end
 
 rule "When right garage door sensor is armed"
@@ -270,7 +351,7 @@ when
     Item garageDoorRightArmed changed from 0 to 1
 then
     logInfo("GarageDoorRightArmed", "Status update " + garageDoorRightArmed.state.toString)
-    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Armed', 1, '', false);
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Armed', 1, '', false);
 end
 
 rule "When right garage door sensor is disabled"
@@ -278,13 +359,28 @@ when
     Item garageDoorRightArmed changed from 1 to 0
 then
     logInfo("GarageDoorRightArmed", "Status update " + garageDoorRightArmed.state.toString)
-    notifyMyAndroid('blahblah', 'Garage Door - Susheel', 'Disabled', 1, '', false);
+    notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Disabled', 1, '', false);
 end
 
 rule "Periodically check presence"
 when
     Time cron "0 * * * * ?"
 then
+    var year   = now.getYear
+    var month  = now.getMonthOfYear
+    var day    = now.getDayOfMonth
+    if (month < 10) month = '0' + month
+    if (day < 10) day = '0' + day
+    var datum  = year + "-" + month + "-" + day + " " + sunsetTime.state
+    logInfo("Sunset", "datum = " + datum)
+    var DateTime sunset = parse(year + "-" + month + "-" + day + "T" + sunsetTime.state)
+    var DateTime sunrise = parse(year + "-" + month + "-" + day + "T" + sunriseTime.state)
+    if (sunset.isAfterNow() && sunrise.isBeforeNow()) {
+        postUpdate("isDark", "OFF")
+    } else {
+        postUpdate("isDark", "ON")
+    }
+
     logInfo("Thermostat", "Checking state...")
 
     if (ThermostatUpstairsModeState.state.toString() == 'Idle') {
@@ -321,12 +417,35 @@ then
 
 end
 
+rule "Periodically check garage door"
+when
+    Time cron "0 0/5 * * * ?"
+then
+  if (manualOverrideGarage.state != ON) {
+    logInfo("Presence", "Checking left garage door...")
+    if (garageDoorLeft.state == ON) {
+        logInfo("Presence", "Left garage door is open.")
+        notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Open', 1, '', false)
+        sendCommand(garageDoorLeft, OFF)
+        logInfo("Presence", "Closed left garage door.")
+    }
+
+    logInfo("Presence", "Checking right garage door...")
+    if (garageDoorRight.state == ON) {
+        logInfo("Presence", "Right garage door is open.")
+        notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Open', 1, '', false)
+        sendCommand(garageDoorRight, OFF)
+        logInfo("Presence", "Closed right garage door.")
+    }
+  }
+end
+
 rule "Waking up rule"
 when
-    Time cron "0 0/5 6-21 ? * MON-THU" or
-    Time cron "0 0/5 6-22 ? * FRI" or
-    Time cron "0 0/5 7-22 ? * SAT" or
-    Time cron "0 0/5 7-21 ? * SUN" 
+    Time cron "0 0/5 5-21 ? * MON-THU" or
+    Time cron "0 0/5 5-22 ? * FRI" or
+    Time cron "0 0/5 6-22 ? * SAT" or
+    Time cron "0 0/5 6-21 ? * SUN" 
 then
     logInfo("Wakeup", "Someone is awake...")
     if (ManualOverride.state != ON) {
@@ -338,10 +457,10 @@ end
 
 rule "Going to bed rule"
 when
-    Time cron "0 0/5 22-23,0-5 ? * MON-THU" or
-    Time cron "0 0/5 23,0-5 ? * FRI" or
-    Time cron "0 0/5 23,0-6 ? * SAT" or
-    Time cron "0 0/5 22-23,0-6 ? * SUN" 
+    Time cron "0 0/5 22-23,0-4 ? * MON-THU" or
+    Time cron "0 0/5 23,0-4 ? * FRI" or
+    Time cron "0 0/5 23,0-5 ? * SAT" or
+    Time cron "0 0/5 22-23,0-5 ? * SUN" 
 then
     logInfo("Bedtime", "Everybody is asleep...")
     if (ManualOverride.state != ON) {
@@ -517,4 +636,114 @@ when
     Item ThermostatUpstairsModeStatus received update
 then
     logInfo("Upstairs Thermostat", "Mode status changed: " + ThermostatUpstairsModeStatus.state.toString())
+end
+
+rule MotionSensorLivingRoomTripped
+when
+    Item MotionSensorLivingRoom changed from CLOSED to OPEN
+then
+    logInfo("LRMotion", "Motion detected, isDark " + isDark.state)
+    if (Wifi_Switch_1.state == OFF && isDark.state == ON) {
+      logInfo("LRMotion", "Turning lights on...")
+      sendCommand(WinkBulb1, ON)
+      sendCommand(WinkBulb1, ON)
+    }
+
+    if (SomeoneIsAwake.state == OFF || Presence.state == OFF) {
+      logInfo("LRMotion", "Everybody is asleep or nobody is home and motion was detected")
+      notifyMyAndroid('CHANGE_ME', 'Living Room', 'Motion Detected', 1, '', false)
+    }
+end
+
+rule NoMotion
+when
+    Item MotionSensorLivingRoom changed from OPEN to CLOSED or
+    Item MotionSensorOffice changed from OPEN to CLOSED 
+then
+    logInfo("Motion", "Motion stoppede")
+      sendCommand(WinkBulb1, OFF)
+      sendCommand(WinkBulb1, OFF)
+end
+
+rule MotionDetected
+when
+    Item MotionSensorLivingRoom received update or
+    Item MotionSensorOffice received update
+then
+    logInfo("Motion", "isDark " + isDark.state)
+    logInfo("Motion", "Motion detected Office " + MotionSensorLivingRoom.state)
+    logInfo("Motion", "Motion detected LR " + MotionSensorOffice.state)
+end
+
+rule MotionSensorOfficeTripped
+when
+    Item MotionSensorOffice changed from CLOSED to OPEN
+then
+    logInfo("OfficeMotion", "Motion detected, isDark " + isDark.state)
+    if (Wifi_Switch_1.state == OFF && isDark.state == ON) {
+      logInfo("OfficeMotion", "Turning lights on...")
+	    sendCommand(Wifi_Switch_1, OFF)
+      sendCommand(WinkBulb1, ON)
+      sendCommand(WinkBulb1, ON)
+    }
+
+    if (SomeoneIsAwake.state == OFF || Presence.state == OFF) {
+      logInfo("OfficeMotion", "Everybody is asleep or nobody is home and motion was detected")
+      notifyMyAndroid('CHANGE_ME', 'Office', 'Motion Detected', 1, '', false)
+    }
+end
+
+rule DoorSensorOfficeOpened
+when
+    Item DoorSensorOffice changed from CLOSED to OPEN
+then
+    logInfo("SunRoom", "Door status changed: " + DoorSensorOffice.state.toString())
+    notifyMyAndroid('CHANGE_ME', 'Sun Room Door', DoorSensorOffice.state.toString(), 1, '', false)
+end
+
+rule DoorSensorOfficeClosed
+when
+    Item DoorSensorOffice changed from OPEN to CLOSED
+then
+    logInfo("SunRoom", "Door status changed: " + DoorSensorOffice.state.toString())
+    notifyMyAndroid('CHANGE_ME', 'Sun Room Door', DoorSensorOffice.state.toString(), 1, '', false)
+end
+
+rule SmokeDetectorHallway
+when
+    Item SmokeDetectorHallway changed from OPEN to CLOSED
+then
+    logInfo("SmokeInHallway", "Hallway smoke detector tripped " + SmokeDetectorHallway.state.toString())
+    notifyMyAndroid('CHANGE_ME', 'Hallway', 'Smoke Detected', 1, '', false)
+end
+
+rule turnWinkBulb1OnOff
+when 
+    Item WinkBulb1 received command
+then
+    logInfo("WinkBulb1", "Command: " + receivedCommand.toString())
+    sendHttpPutRequest("http://192.168.0.5/api/commands/index.php", "application/json", 
+      "[{\"action\":\"update\",\"id\":\"1\",\"updates\":[{\"id\":\"1\",\"value\":\"" + receivedCommand.toString() + "\"}]}]")
+    var switchStatus = sendHttpGetRequest("http://192.168.0.5/api/commands/getStatus.php?deviceId=1")
+    logInfo("WinkBulb1Status", switchStatus)
+    postUpdate(WinkBulb1, switchStatus.trim())
+end
+
+rule turnWinkBulb2OnOff
+when 
+    Item WinkBulb2 received command
+then
+    sendHttpPutRequest("http://192.168.0.5/api/commands/index.php", "application/json", 
+      "[{\"action\":\"update\",\"id\":\"2\",\"updates\":[{\"id\":\"1\",\"value\":\"" + receivedCommand.toString() + "\"}]}]")
+    var switchStatus = sendHttpGetRequest("http://192.168.0.5/api/commands/getStatus.php?deviceId=2")
+    logInfo("WinkBulb2Status", switchStatus)
+    postUpdate(WinkBulb2, switchStatus.trim())
+end
+
+rule turnKankunBulbOnOff
+when
+    Item Wifi_Switch_1 received command
+then
+    var switchStatus  = sendHttpGetRequest("http://192.168.0.10/cgi-bin/relay.cgi?state")
+    postUpdate(Wifi_Switch_1, switchStatus.trim())
 end
