@@ -33,7 +33,7 @@ then
     {
         sendCommand(Presence, ON)
         //squeezeboxSpeak("Office", "Blanca is about to reach home. Blanca is about to reach home.")
-        squeezeboxSpeak("LivingRoom", "Blanca is about to reach home. Blanca is about to reach home.")
+        //squeezeboxSpeak("LivingRoom", "Blanca is about to reach home. Blanca is about to reach home.")
     }
 end
 
@@ -66,7 +66,7 @@ then
     {
         sendCommand(Presence, ON)
         //squeezeboxSpeak("Office", "Susheel is about to reach home. Susheel is about to reach home.")
-        squeezeboxSpeak("LivingRoom", "Susheel is about to reach home. Susheel is about to reach home.")
+        //squeezeboxSpeak("LivingRoom", "Susheel is about to reach home. Susheel is about to reach home.")
     }
 
 end
@@ -186,7 +186,7 @@ when
 then
     logInfo("Dryer", "Status update " + dryer.state.toString)
     //squeezeboxSpeak("Office", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
-    squeezeboxSpeak("LivingRoom", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
+    //squeezeboxSpeak("LivingRoom", "The dryer has finished. The dryer has finished. The dryer has finished. The dryer has finished")
     notifyMyAndroid('CHANGE_ME', 'Dryer', 'Dryer turned OFF', 1, '', false)
 end
 
@@ -196,7 +196,7 @@ when
 then
     logInfo("GarageDoorLeft", "Opened")
     notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Opened', 1, '', false)
-    squeezeboxSpeak("LivingRoom", "Left garage door opened. Left garage door opened.")
+    //squeezeboxSpeak("LivingRoom", "Left garage door opened. Left garage door opened.")
     //squeezeboxSpeak("Office", "Left garage door opened. Left garage door opened.")
 
      // Cancel active timer on this garage door to avoid accidental closure
@@ -209,7 +209,7 @@ then
         if (manualOverrideGarage.state != ON && garageDoorLeft.state == ON) {
             logInfo("Garage Door - Blanca", "Left Open")
             notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Left open', 1, '', false)
-            squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
+            //squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
             //squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
             sendMail('abc@def.org', 'Blanca left the garage door open', '')
             sendMail('def@abc.org', 'Blanca left the garage door open', '')
@@ -226,7 +226,7 @@ when
     Item garageDoorLeft changed from ON to OFF
 then
     logInfo("GarageDoorLeft", "Closed")
-    squeezeboxSpeak('LivingRoom', 'Left garage door closed')
+    //squeezeboxSpeak('LivingRoom', 'Left garage door closed')
     notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Closed', 1, '', false)
 end
 
@@ -236,7 +236,7 @@ when
 then
     logInfo("GarageDoorRight", "Opened")
     notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Opened', 1, '', false)
-    squeezeboxSpeak("LivingRoom", "Right garage door opened. Right garage door opened.")
+    //squeezeboxSpeak("LivingRoom", "Right garage door opened. Right garage door opened.")
     //squeezeboxSpeak("Office", "Right garage door opened. Right garage door opened.")
 
     if(timerGarageDoorRight != null) {
@@ -248,7 +248,7 @@ then
         if (manualOverrideGarage.state != ON && garageDoorRight.state == ON) {
             logInfo("Garage Door - Susheel", "Left Open")
             notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Left open', 1, '', false)
-            squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
+            //squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
             //squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
             sendMail('abc@def.org', 'Susheel left the garage door open', '')
             sendMail('def@abc.org', 'Susheel left the garage door open', '')
@@ -290,7 +290,7 @@ then
         if (manualOverrideGarage.state != ON && garageDoorLeft.state == ON) {
             logInfo("Garage Door - Blanca", "Left Open")
             notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Left open', 1, '', false)
-            squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
+            //squeezeboxSpeak("LivingRoom", "Blanca left garage door open. Blanca left garage door open.")
             //squeezeboxSpeak("Office", "Blanca left garage door open. Blanca left garage door open.")
             sendMail('abc@def.org', 'Blanca left the garage door open', '')
             sendMail('def@abc.org', 'Blanca left the garage door open', '')
@@ -309,7 +309,7 @@ then
         if (manualOverrideGarage.state != ON && garageDoorRight.state == ON) {
             logInfo("Garage Door - Susheel", "Left Open")
             notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Left open', 1, '', false)
-            squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
+            //squeezeboxSpeak("LivingRoom", "Susheel left garage door open. Susheel left garage door open.")
             //squeezeboxSpeak("Office", "Susheel left garage door open. Susheel left garage door open.")
             sendMail('abc@def.org', 'Susheel left the garage door open', '')
             sendMail('def@abc.org', 'Susheel left the garage door open', '')
@@ -326,7 +326,7 @@ when
     Item garageDoorRight changed from ON to OFF
 then
     logInfo("GarageDoorRight", "Status update " + garageDoorRight.state.toString)
-    squeezeboxSpeak("LivingRoom", "Right garage door closed. Right garage door closed.")
+    //squeezeboxSpeak("LivingRoom", "Right garage door closed. Right garage door closed.")
     notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Closed', 1, '', false)
 end
 
@@ -415,29 +415,6 @@ then
         }
     }
 
-end
-
-rule "Periodically check garage door"
-when
-    Time cron "0 0/5 * * * ?"
-then
-  if (manualOverrideGarage.state != ON) {
-    logInfo("Presence", "Checking left garage door...")
-    if (garageDoorLeft.state == ON) {
-        logInfo("Presence", "Left garage door is open.")
-        notifyMyAndroid('CHANGE_ME', 'Garage Door - Blanca', 'Open', 1, '', false)
-        sendCommand(garageDoorLeft, OFF)
-        logInfo("Presence", "Closed left garage door.")
-    }
-
-    logInfo("Presence", "Checking right garage door...")
-    if (garageDoorRight.state == ON) {
-        logInfo("Presence", "Right garage door is open.")
-        notifyMyAndroid('CHANGE_ME', 'Garage Door - Susheel', 'Open', 1, '', false)
-        sendCommand(garageDoorRight, OFF)
-        logInfo("Presence", "Closed right garage door.")
-    }
-  }
 end
 
 rule "Waking up rule"
